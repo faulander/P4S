@@ -2,7 +2,7 @@ from django.db import models
 
 
 class ShowType(models.Model):
-    type = models.CharField(max_length=30)
+    type = models.CharField(max_length=30, blank=True, null=True)
 
     def __str__(self):
         return self.type
@@ -57,7 +57,7 @@ class Country(models.Model):
 class Network(models.Model):
     tvmaze_id = models.IntegerField()
     network = models.CharField(max_length=30)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.network
@@ -66,20 +66,34 @@ class Network(models.Model):
         verbose_name_plural = "Networks"
 
 
+class Webchannel(models.Model):
+    tvmaze_id = models.IntegerField()
+    name = models.CharField(max_length=30)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "Webchannels"
+
 class Show(models.Model):
     tvmaze_id = models.IntegerField()
-    url = models.CharField(max_length=100)
+    url = models.CharField(max_length=100, blank=True, null=True, default=None)
     name = models.CharField(max_length=30)
     type = models.ForeignKey(ShowType, on_delete=models.CASCADE)
-    language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    genre = models.ManyToManyField(Genre)
+    language = models.ForeignKey(Language, on_delete=models.CASCADE, blank=True, null=True, default=None)
+    genre = models.ManyToManyField("Genre", related_name="shows")
     status = models.ForeignKey(Status, on_delete=models.CASCADE)
-    runtime = models.IntegerField()
-    premiere = models.DateTimeField()
-    network = models.ForeignKey(Network, on_delete=models.CASCADE)
-    tvrage_id = models.CharField(max_length=10)
-    thetvdb_id = models.CharField(max_length=10)
-    imdb_id = models.CharField(max_length=10)
+    runtime = models.IntegerField(default=0)
+    premiere = models.DateTimeField(blank=True, null=True, default=None)
+    network = models.ForeignKey(Network, on_delete=models.CASCADE, blank=True, null=True, default=None)
+    webchannel = models.ForeignKey(Webchannel, on_delete=models.CASCADE, blank=True, null=True, default=None)
+    tvrage_id = models.CharField(max_length=10, blank=True, null=True, default=None)
+    thetvdb_id = models.CharField(max_length=10, blank=True, null=True, default=None)
+    imdb_id = models.CharField(max_length=10, blank=True, null=True, default=None)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -89,7 +103,8 @@ class Show(models.Model):
 
 
 class Settings(models.Model):
-    page = models.IntegerField()
+    setting = models.CharField(max_length=30)
+    value = models.CharField(max_length=30)
 
     def __str__(self):
         return self.page.__str__()
