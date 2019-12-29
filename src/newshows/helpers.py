@@ -1,16 +1,21 @@
 from .models import Show, ShowType, Genre, Status, Language, Country, Network, Webchannel, Settings
 import requests
 from loguru import logger
-from django.conf import settings
 from django.utils.timezone import make_aware
 import datetime
 
+
 def updateTvMaze():
-    page = Settings.objects.values_list('value', flat=True).get(setting="page")
+    """
+    TVMazes update API provides tv shows in paged manner,
+    every page contains 250 shows, leaving spaces if shows are deleted.
+    the updateTvMaze function catches up from last run and gets the new shows.      
+    """
+    page = Settings.objects.values_list('value', flat=True).get(setting="page")  # last page which didn't result in a 404
     page = int(page)
     statuscode = 200
     # print(page)
-    while statuscode == 200:
+    while statuscode == 200:  # as long as results are delivered 
         url = "http://api.tvmaze.com/shows?page=" + str(page)
         logger.debug("Trying {}", url)
         r = requests.get(url)
@@ -29,7 +34,6 @@ def updateTvMaze():
                 lstGenres.append(dbGenre)
             dbType, _ = ShowType.objects.get_or_create(type=show['type'])
             dbStatus, _ = Status.objects.get_or_create(status=show['status'])
-            
             if show['network'] is not None:
                 dbCountry, _ = Country.objects.get_or_create(
                     country=show['network']['country']['name'],
@@ -65,10 +69,10 @@ def updateTvMaze():
                 runtime = 0
             if show['premiered'] is not None:
                 premiere_obj = datetime.datetime.strptime(show['premiered'], '%Y-%m-%d')
-                premiere = make_aware(premiere_obj)
+                premiere = make_aware(premiere_obj)  # make timestamp timezone aware
             else:
                 premiere = None
-            dbShow, _ = Show.objects.get_or_create(
+            dbShow, created = Show.objects.get_or_create(
                 tvmaze_id=show['id'],
                 url=show['url'],
                 name=show['name'],
@@ -84,9 +88,13 @@ def updateTvMaze():
                 thetvdb_id=show['externals']['thetvdb'],
                 imdb_id=show['externals']['imdb']
             )
+            if created:
+                logger.info("New show added: {}", show['name'])
             for lstGenre in lstGenres:
                 lstGenre.shows.add(dbShow)
             dbShow.save()
             lstGenres.clear()
         page += 1
         Settings.objects.filter(pk=1).update(value=str(page))
+    page -= 1
+    Settings.objects.filter(pk=1).update(value=str(page))  # get back to last unfinished page

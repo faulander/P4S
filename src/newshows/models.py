@@ -6,14 +6,14 @@ class ShowType(models.Model):
 
     def __str__(self):
         return self.type
-    
+
     class Meta:
         verbose_name_plural = "Show Types"
 
 
 class Language(models.Model):
     language = models.CharField(max_length=30)
-    
+
     def __str__(self):
         return self.language
 
@@ -77,6 +77,7 @@ class Webchannel(models.Model):
     class Meta:
         verbose_name_plural = "Webchannels"
 
+
 class Show(models.Model):
     tvmaze_id = models.IntegerField()
     url = models.CharField(max_length=100, blank=True, null=True, default=None)
@@ -94,6 +95,8 @@ class Show(models.Model):
     imdb_id = models.CharField(max_length=10, blank=True, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    ignored = models.BooleanField(default=False)
+    insonarr = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
