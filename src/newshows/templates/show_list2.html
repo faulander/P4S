@@ -8,15 +8,26 @@
 <form action="" method="get" class="form">
     {{ filter.form.name|as_crispy_field}}
     <div class="form-row">
-        <div class="form-group col-md-6 mb-0">
+        <div class="form-group col-md-3 mb-0">
             {{ filter.form.network|as_crispy_field }}
         </div>
-        <div class="form-group col-md-6 mb-0">
+        <div class="form-group col-md-3 mb-0">
+            {{ filter.form.webchannel|as_crispy_field }}
+        </div>
+        <div class="form-group col-md-2 mb-0">
             {{ filter.form.language|as_crispy_field }}
+        </div>
+        <div class="form-group col-md-2 mb-0">
+            {{ filter.form.status|as_crispy_field }}
+        </div>
+        <div class="form-group col-md-2 mb-0">
+            {{ filter.form.premiere|as_crispy_field }}
         </div>
     </div>
     {{ filter.form.genre|as_crispy_field}}
     <button type="submit" class="btn btn-primary">Filter</button>
+    <button type="reset" class="btn btn-secondary">Reset</button>
+
 </form>
 {% endif %}
     {% render_table table %}
