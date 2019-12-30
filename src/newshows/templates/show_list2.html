@@ -24,7 +24,18 @@
             {{ filter.form.premiere|as_crispy_field }}
         </div>
     </div>
-    {{ filter.form.genre|as_crispy_field}}
+    <div class="form-row">
+        <div class="form-group col-md-6 mb-0">
+            {{ filter.form.genre|as_crispy_field}}
+        </div>
+        <div class="form-group col-md-3 mb-0">
+            {{ filter.form.insonarr|as_crispy_field }}
+        </div>
+        <div class="form-group col-md-3 mb-0">
+            {{ filter.form.ignored|as_crispy_field }}
+        </div>
+    </div>
+
     <button type="submit" class="btn btn-primary">Filter</button>
     <button type="reset" class="btn btn-secondary">Reset</button>
 

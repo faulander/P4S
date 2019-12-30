@@ -8,4 +8,10 @@ class ShowFilter(django_filters.FilterSet):
 
     class Meta:
         model = Show
-        fields = ['name', 'network', 'webchannel', 'language', 'genre', 'premiere', 'imdb_id', 'status']
+        fields = ['name', 'network', 'webchannel', 'language', 'genre', 'premiere', 'imdb_id', 'status', 'insonarr', 'ignored']
+    
+    def __init__(self, *args, **kwargs):
+       super(ShowFilter, self).__init__(*args, **kwargs)
+       self.filters['insonarr'].label="Show added to Sonarr?"
+       self.filters['ignored'].label="Ignored?"
+       

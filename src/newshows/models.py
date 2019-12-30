@@ -81,13 +81,13 @@ class Webchannel(models.Model):
 class Show(models.Model):
     tvmaze_id = models.IntegerField()
     url = models.CharField(max_length=100, blank=True, null=True, default=None)
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, verbose_name="Show")
     type = models.ForeignKey(ShowType, on_delete=models.CASCADE)
     language = models.ForeignKey(Language, on_delete=models.CASCADE, blank=True, null=True, default=None)
     genre = models.ManyToManyField("Genre", related_name="shows")
     status = models.ForeignKey(Status, on_delete=models.CASCADE)
     runtime = models.IntegerField(default=0)
-    premiere = models.DateTimeField(blank=True, null=True, default=None)
+    premiere = models.DateTimeField(blank=True, null=True, default=None, verbose_name="premiered")
     network = models.ForeignKey(Network, on_delete=models.CASCADE, blank=True, null=True, default=None)
     webchannel = models.ForeignKey(Webchannel, on_delete=models.CASCADE, blank=True, null=True, default=None)
     tvrage_id = models.CharField(max_length=10, blank=True, null=True, default=None)
@@ -95,8 +95,8 @@ class Show(models.Model):
     imdb_id = models.CharField(max_length=10, blank=True, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    ignored = models.BooleanField(default=False)
-    insonarr = models.BooleanField(default=False)
+    ignored = models.BooleanField(default=False, verbose_name="I")
+    insonarr = models.BooleanField(default=False, verbose_name="S")
 
     def __str__(self):
         return self.name
