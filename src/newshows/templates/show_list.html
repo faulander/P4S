@@ -1,26 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {% for show in shows %}
-        <div class="show">
-            {{ show.name }}
-        </div>
-    {% endfor %}
-    <div class="pagination">
-        <span class="step-links">
-            {% if shows.has_previous %}
-                <a href="?page=1">&laquo; first</a>
-                <a href="?page={{ shows.previous_page_number }}"><</a>
-            {% endif %}
-    
-            <span class="current">
-                Page {{ shows.number }} of {{ shows.paginator.num_pages }}.
-            </span>
-    
-            {% if shows.has_next %}
-                <a href="?page={{ shows.next_page_number }}">></a>
-                <a href="?page={{ shows.paginator.num_pages }}">last &raquo;</a>
-            {% endif %}
-        </span>
-    </div>
+{% load render_table from django_tables2 %}
+        {% render_table table %}
 {% endblock %}

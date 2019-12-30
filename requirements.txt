@@ -1,0 +1,17 @@
+asgiref==3.2.3
+certifi==2019.11.28
+chardet==3.0.4
+colorama==0.4.3
+Django==3.0.1
+entrypoints==0.3
+flake8==3.7.9
+idna==2.8
+loguru==0.4.0
+mccabe==0.6.1
+pycodestyle==2.5.0
+pyflakes==2.1.1
+pytz==2019.3
+requests==2.22.0
+sqlparse==0.3.0
+urllib3==1.25.7
+win32-setctime==1.0.1

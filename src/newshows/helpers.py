@@ -11,8 +11,11 @@ def updateTvMaze():
     every page contains 250 shows, leaving spaces if shows are deleted.
     the updateTvMaze function catches up from last run and gets the new shows.      
     """
-    page = Settings.objects.values_list('value', flat=True).get(setting="page")  # last page which didn't result in a 404
-    page = int(page)
+    try: 
+        page = Settings.objects.values_list('value', flat=True).get(setting="page")  # last page which didn't result in a 404
+        page = int(page)
+    except:
+        page = 1
     statuscode = 200
     # print(page)
     while statuscode == 200:  # as long as results are delivered 
