@@ -5,10 +5,12 @@ from django.utils.html import format_html
 
 
 class ShowTable(tables.Table):
+    Edit = tables.TemplateColumn('<input type="checkbox" value="{{ record.pk }}" />', verbose_name="Edit")
+
     class Meta:
         model = Show
-        # template_name = "django_tables2/bootstrap.html"
-        fields = ("name", "network", "webchannel", "genre", "language", "status", "premiere", "insonarr", "ignored", )
+        fields = ("name", "network", "webchannel", "genre", "language", "status", "premiere", "insonarr", "ignored",)
+
 
     def render_name(self, value, record):
         if record.imdb_id:
