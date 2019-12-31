@@ -3,9 +3,52 @@ import requests
 from loguru import logger
 from django.utils.timezone import make_aware
 import datetime
+from django.db.models import Q
 
 
-def updateTvMaze():
+def HelperUpdateSonarr():
+    """Gets the complete list of shows in Sonarr API
+    """
+    try:
+        sonarr_url = Settings.objects.values_list('value', flat=True).get(setting="sonarr_url")  
+        sonarr_apikey = Settings.objects.values_list('value', flat=True).get(setting="sonarr_apikey")
+    except:
+        return False
+    endpoint = "/series"
+    url = sonarr_url + endpoint + "?apikey=" + sonarr_apikey
+    logger.debug("Trying {}", url)
+    r = requests.get(url)
+    statuscode = r.status_code
+    logger.debug("Statuscode: {}", statuscode)
+    sonarr = r.json()
+    # logger.debug(sonarr)
+    for s in sonarr:
+        try:
+            s_imdb = s['imdbId']
+        except KeyError:
+            s_imdb = ""
+        try:
+            s_thetvdb = s['tvdbId']
+        except KeyError:
+            s_thetvdb = ""
+        try:
+            s_tvmaze = s['tvMazeId']
+        except KeyError:
+            s_tvmaze = ""
+        try:
+            s_tvrage = s['tvRageId']
+        except KeyError:
+            s_tvrage = ""
+
+        q = Show.objects.filter(
+            Q(tvmaze_id=s_tvmaze) | 
+            Q(tvrage_id=s_tvrage) |
+            Q(thetvdb_id=s_thetvdb) |
+            Q(imdb_id=s_imdb)
+        ).update(insonarr=True)
+
+
+def HelperUpdateTVMaze():
     """
     TVMazes update API provides tv shows in paged manner,
     every page contains 250 shows, leaving spaces if shows are deleted.

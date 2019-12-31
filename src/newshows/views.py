@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .helpers import updateTvMaze
+from .helpers import HelperUpdateTVMaze, HelperUpdateSonarr
 from django.core.paginator import Paginator
 from .models import Show
 from django_tables2 import SingleTableView
@@ -9,13 +9,19 @@ from .filters import ShowFilter
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
 
+
 def index(request):
     return HttpResponse("Hello, world. You're at the new show index.")
 
 
 def updateTVMaze(request):
-    updateTvMaze()
+    HelperUpdateTVMaze()
     return HttpResponse("TVMaze Updated.")
+
+
+def updateSonarr(request):
+    HelperUpdateSonarr()
+    return HttpResponse("Sonarr Updated.")
 
 
 class FilteredShowListView(SingleTableMixin, FilterView):
