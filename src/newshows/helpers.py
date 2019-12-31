@@ -7,7 +7,9 @@ from django.db.models import Q
 
 
 def HelperUpdateSonarr():
-    """Gets the complete list of shows in Sonarr API
+    """
+    Gets the complete list of shows in Sonarr API
+    If a show is found, the column 'insonarr' is set to true
     """
     try:
         sonarr_url = Settings.objects.values_list('value', flat=True).get(setting="sonarr_url")  
@@ -41,7 +43,7 @@ def HelperUpdateSonarr():
             s_tvrage = ""
 
         q = Show.objects.filter(
-            Q(tvmaze_id=s_tvmaze) | 
+            Q(tvmaze_id=s_tvmaze) |
             Q(tvrage_id=s_tvrage) |
             Q(thetvdb_id=s_thetvdb) |
             Q(imdb_id=s_imdb)

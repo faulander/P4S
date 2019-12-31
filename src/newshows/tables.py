@@ -5,11 +5,11 @@ from django.utils.html import format_html
 
 
 class ShowTable(tables.Table):
-    Edit = tables.TemplateColumn('<input type="checkbox" value="{{ record.pk }}" />', verbose_name="Edit")
+    # Edit = tables.TemplateColumn('<input type="checkbox" value="{{ record.pk }}" />', verbose_name="Edit")
 
     class Meta:
         model = Show
-        fields = ("name", "network", "webchannel", "genre", "language", "status", "premiere", "insonarr", "ignored",)
+        fields = ("name", "network", "webchannel", "genre", "language", "status", "premiere", "insonarr",)
 
 
     def render_name(self, value, record):
@@ -18,3 +18,8 @@ class ShowTable(tables.Table):
         else:
             return format_html("{}", value)
    
+    def render_insonarr(self, value, record):
+        if record.thetvdb_id and not value:
+            return format_html("<a href='http://test/{}'>{}</a>", record.thetvdb_id, value)
+        else:
+            return value
