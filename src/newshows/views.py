@@ -8,6 +8,8 @@ from .tables import ShowTable
 from .filters import ShowFilter
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
+from rest_framework import viewsets
+from .serializers import ShowSerializer
 
 
 def index(request):
@@ -31,3 +33,11 @@ class FilteredShowListView(SingleTableMixin, FilterView):
     paginate_by = 35
 
     filterset_class = ShowFilter
+
+
+class ShowViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows Shows to be viewed or edited.
+    """
+    queryset = Show.objects.all().order_by('-premiere')
+    serializer_class = ShowSerializer
