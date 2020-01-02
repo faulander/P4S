@@ -107,10 +107,10 @@ class Show(models.Model):
 
 class Settings(models.Model):
     setting = models.CharField(max_length=30)
-    value = models.CharField(max_length=30)
+    value = models.CharField(max_length=30, blank=True, null=True, default=None)
 
     def __str__(self):
-        return self.page.__str__()
+        return self.setting.__str__()
 
     class Meta:
         verbose_name_plural = "Settings"
