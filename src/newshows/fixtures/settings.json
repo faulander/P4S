@@ -22,5 +22,22 @@
             "setting": "sonarr_apikey",
             "value": ""
         }
-    }
+    },
+    {
+        "model": "newshows.settings",
+        "pk": 4,
+        "fields": {
+            "setting": "sonarr_addmonitored",
+            "value": "True"
+        }
+    },
+    {
+        "model": "newshows.settings",
+        "pk": 5,
+        "fields": {
+            "setting": "sonarr_autoadd",
+            "value": "False"
+        }
+    },
+
 ]

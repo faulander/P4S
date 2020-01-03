@@ -106,7 +106,7 @@ class Show(models.Model):
 
 
 class Settings(models.Model):
-    setting = models.CharField(max_length=30)
+    setting = models.CharField(max_length=30, blank=True, null=True, default=None)
     value = models.CharField(max_length=30, blank=True, null=True, default=None)
 
     def __str__(self):

@@ -57,7 +57,7 @@ def HelperUpdateSonarr():
         ).update(insonarr=True)
 
 
-@register_job(scheduler, "interval", minutes=1, replace_existing=True)
+@register_job(scheduler, "interval", hours=1, replace_existing=True)
 def HelperUpdateTVMaze():
     """
     TVMazes update API provides tv shows in paged manner,
@@ -90,7 +90,10 @@ def HelperUpdateTVMaze():
             for genre in show["genres"]:
                 dbGenre, _ = Genre.objects.get_or_create(genre=genre)
                 lstGenres.append(dbGenre)
-            dbType, _ = ShowType.objects.get_or_create(type=show['type'])
+            if show['type'] is not None:
+                dbType, _ = ShowType.objects.get_or_create(type=show['type'])
+            else:
+                dbType = None
             dbStatus, _ = Status.objects.get_or_create(status=show['status'])
             if show['network'] is not None:
                 dbCountry, _ = Country.objects.get_or_create(
@@ -132,22 +135,26 @@ def HelperUpdateTVMaze():
                 premiere = None
             dbShow, created = Show.objects.get_or_create(
                 tvmaze_id=show['id'],
-                url=show['url'],
-                name=show['name'],
-                type=dbType,
-                language=dbLanguage,
-                # genre = models.ManyToManyField(Genre)
-                status=dbStatus,
-                runtime=runtime,
-                premiere=premiere,
-                network=dbNetwork,
-                webchannel=dbWebchannel,
-                tvrage_id=show['externals']['tvrage'],
-                thetvdb_id=show['externals']['thetvdb'],
-                imdb_id=show['externals']['imdb']
+                defaults={
+                    'url':show['url'],
+                    'name':show['name'],
+                    'type':dbType,
+                    'language':dbLanguage,
+                    # genre = models.ManyToManyField(Genre)
+                    'status':dbStatus,
+                    'runtime':runtime,
+                    'premiere':premiere,
+                    'network':dbNetwork,
+                    'webchannel':dbWebchannel,
+                    'tvrage_id':show['externals']['tvrage'],
+                    'thetvdb_id':show['externals']['thetvdb'],
+                    'imdb_id':show['externals']['imdb']
+                }
             )
             if created:
                 logger.info("New show added: {}", show['name'])
+            else:
+                logger.info("Show already in DB: {}", show['name'])
             for lstGenre in lstGenres:
                 lstGenre.shows.add(dbShow)
             dbShow.save()
@@ -173,7 +180,10 @@ def updateSingleShow(tvmaze_id):
         for genre in show["genres"]:
             dbGenre, _ = Genre.objects.get_or_create(genre=genre)
             lstGenres.append(dbGenre)
-        dbType, _ = ShowType.objects.get_or_create(type=show['type'])
+        if show['type'] is not None:
+            dbType, _ = ShowType.objects.get_or_create(type=show['type'])
+        else:
+            dbType = None
         dbStatus, _ = Status.objects.get_or_create(status=show['status'])
         if show['network'] is not None:
             dbCountry, _ = Country.objects.get_or_create(
@@ -214,24 +224,27 @@ def updateSingleShow(tvmaze_id):
         else:
             premiere = None
         dbShow = Show.objects.get(tvmaze_id=show['id'])
-        dbShow.url=show['url'],
-        dbShow.name=show['name'],
-        dbShow.type=dbType,
-        dbShow.language=dbLanguage,
+        dbShow.url = show['url'],
+        dbShow.name = show['name'],
+        dbShow.type = dbType,
+        dbShow.language = dbLanguage,
             # genre = models.ManyToManyField(Genre)
-        dbShow.status=dbStatus,
-        dbShow.runtime=runtime,
-        dbShow.premiere=premiere,
-        dbShow.network=dbNetwork,
-        dbShow.webchannel=dbWebchannel,
-        dbShow.tvrage_id=show['externals']['tvrage'],
-        dbShow.thetvdb_id=show['externals']['thetvdb'],
-        dbShow.imdb_id=show['externals']['imdb']
-        dbShow.save()
+        dbShow.status = dbStatus,
+        dbShow.runtime = runtime,
+        dbShow.premiere = premiere,
+        dbShow.network = dbNetwork,
+        dbShow.webchannel = dbWebchannel,
+        dbShow.tvrage_id = show['externals']['tvrage'],
+        dbShow.thetvdb_id = show['externals']['thetvdb'],
+        dbShow.imdb_id = show['externals']['imdb']
+        try:
+            dbShow.save()
+        except ValueError:
+            debug.error("Error: {}", show)
         logger.info("Show '{}' updated.", show['name'])
 
 
-# @register_job(scheduler, "interval", seconds=30, replace_existing=True)
+@register_job(scheduler, "interval", seconds=30, replace_existing=True)
 def HelperUpdateShows():
     url = "http://api.tvmaze.com/updates/shows"
     r = requests.get(url)

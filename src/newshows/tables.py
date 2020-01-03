@@ -6,7 +6,8 @@ from django.utils.html import format_html
 
 class ShowTable(tables.Table):
     # Edit = tables.TemplateColumn('<input type="checkbox" value="{{ record.pk }}" />', verbose_name="Edit")
-
+    premiere = tables.DateColumn(format="y-m-d")
+ 
     class Meta:
         model = Show
         fields = ("name", "network", "webchannel", "genre", "language", "status", "premiere", "insonarr",)
@@ -28,6 +29,15 @@ class ShowTable(tables.Table):
 
     def render_insonarr(self, value, record):
         if record.thetvdb_id and not value:
-            return format_html("<a href='/api/{}'>Add to Sonarr</a>", record.thetvdb_id)
+            returnstring = "<button class='btn btn-primary' id='addSonarr' value='" + str(record.thetvdb_id) + "' name='btn_addSonarr'>Add</button>"
+            return format_html(returnstring)
         elif not record.thetvdb_id:
-            return "No ID"
+            returnstring = "<button class='btn btn-secondary' id='lookupSonarr' value='" + str(record.name) + "' name='btn_addSonarr'>Lookup</button>"
+            return format_html(returnstring)
+
+    """
+    def render_premiere(self, value, record):
+        tmpPremiere = str(record.premiere)
+        tmpPremiere.split("midnight")
+        return tmpPremiere
+    """

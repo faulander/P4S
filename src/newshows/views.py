@@ -1,8 +1,8 @@
 #  from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .helpers import HelperUpdateTVMaze, HelperUpdateSonarr
 #  from django.core.paginator import Paginator
-from .models import Show
+from .models import Show, Settings
 #  from django_tables2 import SingleTableView
 from .tables import ShowTable
 from .filters import ShowFilter
@@ -13,6 +13,8 @@ from django_tables2.views import SingleTableMixin
 #  from .pagination import CustomPagination
 import requests
 from loguru import logger
+from extra_views import ModelFormSetView
+
 
 def AddShowToSonarr(request, thetvdb_id):
     """
@@ -59,3 +61,10 @@ class ShowViewSet(viewsets.ModelViewSet):
     serializer_class = ShowSerializer
     pagination_class = CustomPagination
 """
+
+
+class UpdateSettings(ModelFormSetView):
+    model = Settings
+    fields = ['setting', 'value']
+    template_name = 'settings.html'
+    success_url = '/shows'

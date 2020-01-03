@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "django_apscheduler",
     'django_tables2',
     'django_filters',
+    'extra_views',
     'crispy_forms',
     'newshows'
 ]
