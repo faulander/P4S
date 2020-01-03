@@ -166,11 +166,11 @@ def HelperUpdateTVMaze():
 
 
 def updateSingleShow(tvmaze_id):
-    logger.debug("Trying TVMaze ID: {}", tvmaze_id)
+    # logger.debug("Trying TVMaze ID: {}", tvmaze_id)
     lstGenres = list()
     url = "http://api.tvmaze.com/shows/" + str(tvmaze_id)
     r = requests.get(url)
-    logger.debug("Statuscode: {}", r.status_code)
+    # logger.debug("Statuscode: {}", r.status_code)
     if r.status_code == 200:
         show = r.json()
         if show['language'] is not None:
@@ -184,6 +184,7 @@ def updateSingleShow(tvmaze_id):
             dbType, _ = ShowType.objects.get_or_create(type=show['type'])
         else:
             dbType = None
+        # logger.debug(dbType)
         dbStatus, _ = Status.objects.get_or_create(status=show['status'])
         if show['network'] is not None:
             dbCountry, _ = Country.objects.get_or_create(
@@ -224,23 +225,19 @@ def updateSingleShow(tvmaze_id):
         else:
             premiere = None
         dbShow = Show.objects.get(tvmaze_id=show['id'])
-        dbShow.url = show['url'],
-        dbShow.name = show['name'],
-        dbShow.type = dbType,
-        dbShow.language = dbLanguage,
-            # genre = models.ManyToManyField(Genre)
-        dbShow.status = dbStatus,
-        dbShow.runtime = runtime,
-        dbShow.premiere = premiere,
-        dbShow.network = dbNetwork,
-        dbShow.webchannel = dbWebchannel,
-        dbShow.tvrage_id = show['externals']['tvrage'],
-        dbShow.thetvdb_id = show['externals']['thetvdb'],
+        dbShow.url = show['url']
+        dbShow.name = show['name']
+        dbShow.type = dbType
+        dbShow.language = dbLanguage
+        dbShow.status = dbStatus
+        dbShow.runtime = runtime
+        dbShow.premiere = premiere
+        dbShow.network = dbNetwork
+        dbShow.webchannel = dbWebchannel
+        dbShow.tvrage_id = show['externals']['tvrage']
+        dbShow.thetvdb_id = show['externals']['thetvdb']
         dbShow.imdb_id = show['externals']['imdb']
-        try:
-            dbShow.save()
-        except ValueError:
-            debug.error("Error: {}", show)
+        dbShow.save()
         logger.info("Show '{}' updated.", show['name'])
 
 
