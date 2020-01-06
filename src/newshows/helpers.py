@@ -12,7 +12,7 @@ scheduler = BackgroundScheduler()
 scheduler.add_jobstore(DjangoJobStore(), "default")
 
 
-#  @register_job(scheduler, "interval", minutes=5, replace_existing=True)
+@register_job(scheduler, "interval", minutes=5, replace_existing=True)
 def HelperUpdateSonarr():
     """
     Gets the complete list of shows in Sonarr API
@@ -57,7 +57,7 @@ def HelperUpdateSonarr():
         ).update(insonarr=True)
 
 
-@register_job(scheduler, "interval", hours=1, replace_existing=True)
+@register_job(scheduler, "interval", hours=24, replace_existing=True)
 def HelperUpdateTVMaze():
     """
     TVMazes update API provides tv shows in paged manner,
@@ -241,23 +241,24 @@ def updateSingleShow(tvmaze_id):
         logger.info("Show '{}' updated.", show['name'])
 
 
-@register_job(scheduler, "interval", seconds=30, replace_existing=True)
+@register_job(scheduler, "interval", hours=12, replace_existing=True)
 def HelperUpdateShows():
     url = "http://api.tvmaze.com/updates/shows"
     r = requests.get(url)
     if r.status_code == 200:
         u = r.json()
         # logger.debug(u)
-        for i  in range(len(u)):
+        for i in range(len(u)):
+            updateSingleShow(str(i + 1))
             try:
-                d1 = pendulum.from_timestamp(u[str(i+1)])
+                d1 = pendulum.from_timestamp(u[str(i + 1)])
                 d2 = pendulum.now()
                 delta = d2 - d1
                 if delta.days < 2:
                     #  Show has been updated in the last 2 days
                     # we are running the tvmaze update every 24 hours, so we are save
                     # to get all updates
-                    updateSingleShow(str(i+1))
+                    updateSingleShow(str(i + 1))
             except KeyError:
                 pass
     

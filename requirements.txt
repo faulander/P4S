@@ -10,3 +10,4 @@ loguru
 pendulum
 pyflakes
 requests
+gunicorn

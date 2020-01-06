@@ -68,3 +68,4 @@ class UpdateSettings(ModelFormSetView):
     fields = ['setting', 'value']
     template_name = 'settings.html'
     success_url = '/shows'
+    factory_kwargs = {'extra': 0}
