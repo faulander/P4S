@@ -7,9 +7,13 @@ urlpatterns = [
     path('', include('newshows.urls')),
     path('admin/', admin.site.urls),
 ]
-
-if not os.environ['firstrun']:
-    # Run the Updater once on Startup
+try:
+    if not os.environ['firstrun'] == "1":
+        # Run the Updater once on Startup
+        helpers.HelperUpdateTVMaze()
+        helpers.HelperUpdateShows()
+        os.environ['firstrun'] = "1"
+except KeyError:
     helpers.HelperUpdateTVMaze()
     helpers.HelperUpdateShows()
     os.environ['firstrun'] = "1"

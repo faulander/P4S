@@ -1,19 +1,14 @@
 import os
-import environ
+import logging.config
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-env = environ.Env(
-    DEBUG=(bool, True)
-)
-environ.Env.read_env()
-DEBUG = env('DEBUG')
-SECRET_KEY = env('SECRET_KEY')
-
-ALLOWED_HOSTS = []
-
+DEBUG = os.getenv('DEBUG', "True")
+SECRET_KEY = os.getenv('SECRET_KEY')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(',')
+LOGLEVEL = os.getenv('LOGLEVEL', 'info').upper()
 
 # Application definition
 
@@ -117,3 +112,28 @@ STATIC_URL = 'static/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap4.html"
+
+# Logging Configuration
+LOGGING_CONFIG = None
+
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+    },
+    'loggers': {
+        '': {
+            'level': LOGLEVEL,
+            'handlers': ['console',],
+        },
+    },
+})
