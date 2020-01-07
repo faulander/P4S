@@ -5,9 +5,7 @@ django-extra-views
 django-filter
 django-tables2
 APScheduler
-flake8
 loguru
 pendulum
-pyflakes
 requests
 uwsgi

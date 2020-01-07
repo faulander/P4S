@@ -13,6 +13,7 @@ try:
         helpers.HelperUpdateTVMaze()
         helpers.HelperUpdateShows()
         os.environ['firstrun'] = "1"
+    helpers.helperGetSonarrProfiles()
 except KeyError:
     helpers.HelperUpdateTVMaze()
     helpers.HelperUpdateShows()

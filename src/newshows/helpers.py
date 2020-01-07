@@ -1,15 +1,17 @@
-from .models import Show, ShowType, Genre, Status, Language, Country, Network, Webchannel, Settings
+from .models import Show, ShowType, Genre, Status, Language, Country, Network, Webchannel, Settings, Profile, Setting
 import requests
-from loguru import logger
 from django.utils.timezone import make_aware
 import datetime
 from django.db.models import Q
 from apscheduler.schedulers.background import BackgroundScheduler
 from django_apscheduler.jobstores import DjangoJobStore, register_events, register_job
 import pendulum
+import logging
 
 scheduler = BackgroundScheduler()
 scheduler.add_jobstore(DjangoJobStore(), "default")
+
+logger = logging.getLogger(__name__)
 
 
 @register_job(scheduler, "interval", minutes=5, replace_existing=True)
@@ -18,11 +20,9 @@ def HelperUpdateSonarr():
     Gets the complete list of shows in Sonarr API
     If a show is found, the column 'insonarr' is set to true
     """
-    try:
-        sonarr_url = Settings.objects.values_list('value', flat=True).get(setting="sonarr_url")  
-        sonarr_apikey = Settings.objects.values_list('value', flat=True).get(setting="sonarr_apikey")
-    except:
-        return False
+    settings = Setting.objects.get(id=1)
+    sonarr_url = settings.sonarr_url
+    sonarr_apikey = settings.sonarr_apikey
     endpoint = "/series"
     url = sonarr_url + endpoint + "?apikey=" + sonarr_apikey
     logger.debug("Trying {}", url)
@@ -64,13 +64,13 @@ def HelperUpdateTVMaze():
     every page contains 250 shows, leaving spaces if shows are deleted.
     the updateTvMaze function catches up from last run and gets the new shows.      
     """
-    try: 
-        page = Settings.objects.values_list('value', flat=True).get(setting='page')  # last page which didn't result in a 404
-        page = int(page)
+    try:
+        settings = Setting.objects.get(id=1)
+        page = int(settings.page)
     except:
         page = 0
-        p = Settings(setting='page', value='0')
-        p.save()
+        settings.page = 0
+        settings.save()
     statuscode = 200
     # print(page)
     while statuscode == 200:  # as long as results are delivered 
@@ -160,9 +160,11 @@ def HelperUpdateTVMaze():
             dbShow.save()
             lstGenres.clear()
         page += 1
-        Settings.objects.filter(pk=1).update(value=str(page))
+        settings.page = page
+        settings.save()
     page -= 2
-    Settings.objects.filter(pk=1).update(value=str(page))  # get back to last unfinished page
+    settings.page = page  # get back to last unfinished page
+    settings.save()
 
 
 def updateSingleShow(tvmaze_id):
@@ -262,6 +264,24 @@ def HelperUpdateShows():
             except KeyError:
                 pass
     
+@register_job(scheduler, "interval", minutes=10, replace_existing=True)
+def helperGetSonarrProfiles():
+    settings = Setting.objects.get(id=1)
+    sonarr_url = settings.sonarr_url
+    sonarr_apikey = settings.sonarr_apikey
+    endpoint = "/profile"
+    url = sonarr_url + endpoint + "?apikey=" + sonarr_apikey
+    logger.debug("Trying {}", url)
+    r = requests.get(url)
+    statuscode = r.status_code
+    logger.debug("Statuscode: {}", statuscode)
+    sonarr = r.json()
+    for s in sonarr:
+        dbProfile, _ = Profile.objects.get_or_create(
+            profile=s['name'],
+            profile_id=s['id']
+        )
+
 
 register_events(scheduler)
 scheduler.start()

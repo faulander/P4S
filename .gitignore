@@ -213,6 +213,7 @@ pip-selfcheck.json
 
 ### OWN ###
 .env
+.info
 
 
 # End of https://www.gitignore.io/api/git,venv,python,django,visualstudiocode

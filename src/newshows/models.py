@@ -114,3 +114,28 @@ class Settings(models.Model):
 
     class Meta:
         verbose_name_plural = "Settings"
+
+
+class Profile(models.Model):
+    profile = models.CharField(max_length=20, blank=True, null=True, default=None)
+    profile_id = models.IntegerField()
+
+    def __str__(self):
+        return self.profile.__str__()
+
+    class Meta:
+        verbose_name_plural = "Profiles"
+
+
+class Setting(models.Model):
+    page = models.IntegerField()
+    sonarr_url = models.CharField(max_length=100, blank=True, null=True, default=None, verbose_name="Sonarr URL")
+    sonarr_apikey = models.CharField(max_length=50, blank=True, null=True, default=None, verbose_name="Sonarr API Key")
+    sonarr_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True, verbose_name="Sonarr Profile ID")
+    sonarr_autoadd = models.BooleanField(default=False, verbose_name="Auto add shows to Sonarr")
+
+    def __str__(self):
+        return "Settings"
+
+    class Meta:
+        verbose_name_plural = "Settings"

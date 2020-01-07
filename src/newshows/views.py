@@ -1,49 +1,50 @@
-#  from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
-from .helpers import HelperUpdateTVMaze, HelperUpdateSonarr
-#  from django.core.paginator import Paginator
-from .models import Show, Settings
-#  from django_tables2 import SingleTableView
-from .tables import ShowTable
-from .filters import ShowFilter
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
-#  from rest_framework import viewsets
-#  from .serializers import ShowSerializer
-#  from .pagination import CustomPagination
+from django.views.generic import UpdateView
+
+from .models import Show, Setting
+from .tables import ShowTable
+from .filters import ShowFilter
+from .forms import SettingForm
+
 import requests
-from loguru import logger
-from extra_views import ModelFormSetView
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def AddShowToSonarr(request, thetvdb_id):
+    """
+    Info from Sonarr:
+    Required: tvdbId (int) title (string) profileId (int) titleSlug (string) images (array) seasons (array) - See GET output for format
+
+    TODO: get ProfileId's
+    TODO: get title
+    TODO: create titleSlug
+    TODO: Create ImageArray
+    TODO: Get seasons 
+    
+    meanwhile use Lookup, endpoint /series/lookups
+    
     """
     try:
         sonarr_url = Settings.objects.values_list('value', flat=True).get(setting="sonarr_url")  
         sonarr_apikey = Settings.objects.values_list('value', flat=True).get(setting="sonarr_apikey")
     except:
         return False
-    endpoint = "/series"
-    url = sonarr_url + endpoint + "?apikey=" + sonarr_apikey
+    endpoint = "/series/lookup"
+    url = sonarr_url + endpoint + "?term=tvdb:" + str(thetvdb_id) + "&?apikey=" + sonarr_apikey
     logger.debug("Trying {}", url)
     r = requests.post(url)
     statuscode = r.status_code
-    """
-    logger.debug(thetvdb_id)    
+    if statuscode == 200:
+        pass
+    else:
+        return False
 
 
 def index(request):
     return HttpResponse("Hello, world. You're at the new show index.")
-
-
-def updateTVMaze(request):
-    HelperUpdateTVMaze()
-    return HttpResponse("TVMaze Updated.")
-
-
-def updateSonarr(request):
-    HelperUpdateSonarr()
-    return HttpResponse("Sonarr Updated.")
 
 
 class FilteredShowListView(SingleTableMixin, FilterView):
@@ -60,12 +61,20 @@ class ShowViewSet(viewsets.ModelViewSet):
     queryset = Show.objects.all().order_by('-premiere')
     serializer_class = ShowSerializer
     pagination_class = CustomPagination
-"""
-
 
 class UpdateSettings(ModelFormSetView):
-    model = Settings
-    fields = ['setting', 'value']
+    model = Setting
+    fields = ['sonarr_url', 'sonarr_apikey', 'sonarr_autoadd']
     template_name = 'settings.html'
     success_url = '/shows'
     factory_kwargs = {'extra': 0}
+"""
+
+
+class UpdateSettings(UpdateView):
+    model = Setting
+    form_class = SettingForm
+    template_name = 'settings.html'
+
+    def get_object(self):
+        return Setting.objects.get(pk=1)

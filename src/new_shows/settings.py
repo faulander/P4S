@@ -106,9 +106,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 MEDIA_ROOT = os.path.join(SITE_ROOT, 'assets')
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap4.html"

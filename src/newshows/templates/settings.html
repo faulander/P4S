@@ -5,20 +5,7 @@
 {% block content %}
     <form method="post">
         {% csrf_token %}
-        {{ formset.management_form }}
-        {% for form in formset %}
-            <div class="row">
-                <div class="col-6">
-                    {{ form.id }}            
-                    {{ form.setting|as_crispy_field }}
-                </div>
-                <div class="col-6">            
-                    {{ form.value|as_crispy_field }}
-                </div>
-            </div>
-        {% endfor %}
-        <div class="form-group form-actions">
-            <button class="btn btn-success">Change</button>
-        </div>
+        {{ form|crispy }}
+        <button class="btn btn-success">Change</button>
     </form>
 {% endblock %}
