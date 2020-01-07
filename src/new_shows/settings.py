@@ -1,5 +1,6 @@
 import os
 import logging.config
+from django.contrib.messages import constants as messages
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -116,6 +117,14 @@ DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap4.html"
 
 # Logging Configuration
 LOGGING_CONFIG = None
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
 
 logging.config.dictConfig({
     'version': 1,

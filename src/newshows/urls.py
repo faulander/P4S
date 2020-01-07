@@ -10,5 +10,5 @@ urlpatterns = [
     #  path('updateSonarr/', views.updateSonarr, name='updateSonarr'),
     path("shows/", FilteredShowListView.as_view()),
     path("api/<int:thetvdb_id>", views.AddShowToSonarr, name='addShowToSonarr'),
-    path('settings/', UpdateSettings.as_view(success_url="/shows"))
+    path('settings/', UpdateSettings.as_view(success_url="/settings"))
 ]

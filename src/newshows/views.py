@@ -1,6 +1,7 @@
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
 from django.views.generic import UpdateView
+from django.contrib.messages.views import SuccessMessageMixin
 
 from .models import Show, Setting
 from .tables import ShowTable
@@ -71,10 +72,11 @@ class UpdateSettings(ModelFormSetView):
 """
 
 
-class UpdateSettings(UpdateView):
+class UpdateSettings(SuccessMessageMixin, UpdateView):
     model = Setting
     form_class = SettingForm
     template_name = 'settings.html'
+    success_message = "Settings saved"
 
     def get_object(self):
         return Setting.objects.get(pk=1)
