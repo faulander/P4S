@@ -1,4 +1,4 @@
-from .models import Show, ShowType, Genre, Status, Language, Country, Network, Webchannel, Settings, Profile, Setting
+from .models import Show, ShowType, Genre, Status, Language, Country, Network, Webchannel, Profile, Setting
 import requests
 from django.utils.timezone import make_aware
 import datetime
@@ -23,38 +23,39 @@ def HelperUpdateSonarr():
     settings = Setting.objects.get(id=1)
     sonarr_url = settings.sonarr_url
     sonarr_apikey = settings.sonarr_apikey
-    endpoint = "/series"
-    url = sonarr_url + endpoint + "?apikey=" + sonarr_apikey
-    logger.info("Trying {}".format(url))
-    r = requests.get(url)
-    statuscode = r.status_code
-    logger.info("Statuscode: {}".format(statuscode))
-    sonarr = r.json()
-    # logger.debug(sonarr)
-    for s in sonarr:
-        try:
-            s_imdb = s['imdbId']
-        except KeyError:
-            s_imdb = ""
-        try:
-            s_thetvdb = s['tvdbId']
-        except KeyError:
-            s_thetvdb = ""
-        try:
-            s_tvmaze = s['tvMazeId']
-        except KeyError:
-            s_tvmaze = ""
-        try:
-            s_tvrage = s['tvRageId']
-        except KeyError:
-            s_tvrage = ""
+    if settings.sonarr_ok:
+        endpoint = "/series"
+        url = sonarr_url + endpoint + "?apikey=" + sonarr_apikey
+        logger.info("Trying {}".format(url))
+        r = requests.get(url)
+        statuscode = r.status_code
+        logger.info("Statuscode: {}".format(statuscode))
+        sonarr = r.json()
+        # logger.debug(sonarr)
+        for s in sonarr:
+            try:
+                s_imdb = s['imdbId']
+            except KeyError:
+                s_imdb = ""
+            try:
+                s_thetvdb = s['tvdbId']
+            except KeyError:
+                s_thetvdb = ""
+            try:
+                s_tvmaze = s['tvMazeId']
+            except KeyError:
+                s_tvmaze = ""
+            try:
+                s_tvrage = s['tvRageId']
+            except KeyError:
+                s_tvrage = ""
 
-        q = Show.objects.filter(
-            Q(tvmaze_id=s_tvmaze) |
-            Q(tvrage_id=s_tvrage) |
-            Q(thetvdb_id=s_thetvdb) |
-            Q(imdb_id=s_imdb)
-        ).update(insonarr=True)
+            q = Show.objects.filter(
+                Q(tvmaze_id=s_tvmaze) |
+                Q(tvrage_id=s_tvrage) |
+                Q(thetvdb_id=s_thetvdb) |
+                Q(imdb_id=s_imdb)
+            ).update(insonarr=True)
 
 
 @register_job(scheduler, "interval", hours=24, replace_existing=True)
@@ -62,18 +63,15 @@ def HelperUpdateTVMaze():
     """
     TVMazes update API provides tv shows in paged manner,
     every page contains 250 shows, leaving spaces if shows are deleted.
-    the updateTvMaze function catches up from last run and gets the new shows.      
+    the updateTvMaze function catches up from last run and gets the new shows.
     """
     try:
         settings = Setting.objects.get(id=1)
         page = int(settings.page)
     except:
         page = 0
-        #settings.page = 0
-        #settings.save()
     statuscode = 200
-    # print(page)
-    while statuscode == 200:  # as long as results are delivered 
+    while statuscode == 200:  # as long as results are delivered
         url = "http://api.tvmaze.com/shows?page=" + str(page)
         logger.info("Trying {}".format(url))
         r = requests.get(url)
@@ -82,7 +80,6 @@ def HelperUpdateTVMaze():
         shows = r.json()
         lstGenres = list()
         for show in shows:
-            # logger.debug(show)
             if show['language'] is not None:
                 dbLanguage, _ = Language.objects.get_or_create(language=show['language'])
             else:
@@ -136,19 +133,18 @@ def HelperUpdateTVMaze():
             dbShow, created = Show.objects.get_or_create(
                 tvmaze_id=show['id'],
                 defaults={
-                    'url':show['url'],
-                    'name':show['name'],
-                    'type':dbType,
-                    'language':dbLanguage,
-                    # genre = models.ManyToManyField(Genre)
-                    'status':dbStatus,
-                    'runtime':runtime,
-                    'premiere':premiere,
-                    'network':dbNetwork,
-                    'webchannel':dbWebchannel,
-                    'tvrage_id':show['externals']['tvrage'],
-                    'thetvdb_id':show['externals']['thetvdb'],
-                    'imdb_id':show['externals']['imdb']
+                    'url': show['url'],
+                    'name': show['name'],
+                    'type': dbType,
+                    'language': dbLanguage,
+                    'status': dbStatus,
+                    'runtime': runtime,
+                    'premiere': premiere,
+                    'network': dbNetwork,
+                    'webchannel': dbWebchannel,
+                    'tvrage_id': show['externals']['tvrage'],
+                    'thetvdb_id': show['externals']['thetvdb'],
+                    'imdb_id': show['externals']['imdb']
                 }
             )
             if created:
@@ -168,11 +164,9 @@ def HelperUpdateTVMaze():
 
 
 def updateSingleShow(tvmaze_id):
-    # logger.debug("Trying TVMaze ID: {}", tvmaze_id)
     lstGenres = list()
     url = "http://api.tvmaze.com/shows/" + str(tvmaze_id)
     r = requests.get(url)
-    # logger.debug("Statuscode: {}", r.status_code)
     if r.status_code == 200:
         show = r.json()
         if show['language'] is not None:
@@ -186,7 +180,6 @@ def updateSingleShow(tvmaze_id):
             dbType, _ = ShowType.objects.get_or_create(type=show['type'])
         else:
             dbType = None
-        # logger.debug(dbType)
         dbStatus, _ = Status.objects.get_or_create(status=show['status'])
         if show['network'] is not None:
             dbCountry, _ = Country.objects.get_or_create(
@@ -249,7 +242,6 @@ def HelperUpdateShows():
     r = requests.get(url)
     if r.status_code == 200:
         u = r.json()
-        # logger.debug(u)
         for i in range(len(u)):
             updateSingleShow(str(i + 1))
             try:
@@ -263,11 +255,11 @@ def HelperUpdateShows():
                     updateSingleShow(str(i + 1))
             except KeyError:
                 pass
-    
+
 @register_job(scheduler, "interval", minutes=10, replace_existing=True)
 def helperGetSonarrProfiles():
     settings = Setting.objects.get(id=1)
-    if settings.sonarr_url and settings.sonarr_apikey:
+    if settings.sonarr_ok:
         sonarr_url = settings.sonarr_url
         sonarr_apikey = settings.sonarr_apikey
         endpoint = "/profile"

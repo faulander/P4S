@@ -1,4 +1,11 @@
 from django.db import models
+from django.contrib import messages
+
+import requests
+import logging
+import json
+
+logger = logging.getLogger(__name__)
 
 
 class ShowType(models.Model):
@@ -133,9 +140,43 @@ class Setting(models.Model):
     sonarr_apikey = models.CharField(max_length=50, blank=True, null=True, default=None, verbose_name="Sonarr API Key")
     sonarr_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True, verbose_name="Sonarr Profile ID")
     sonarr_autoadd = models.BooleanField(default=False, verbose_name="Auto add shows to Sonarr")
+    sonarr_ok = models.BooleanField(default=False, verbose_name="Settings for Sonarr ok")
 
     def __str__(self):
         return "Settings"
 
     class Meta:
         verbose_name_plural = "Settings"
+    
+    #  Upon saving let's try and get the status of Sonarr
+    #  If the response isn't valid JSON, the details are wrong
+    #  and the sonarr_ok setting is set to False
+    #  If the response is valid JSON, the sonarr_ok setting is set to True
+    #  Shows should show up with the correct buttons and column
+    
+    def save(self, *args, **kwargs):
+        if self.sonarr_url and self.sonarr_apikey:
+            # both url and apikey are set
+            endpoint = "/system/status"
+            url = self.sonarr_url + endpoint + "?apikey=" + self.sonarr_apikey
+            logger.info("Trying {}".format(url))
+            r = requests.get(url)
+            statuscode = r.status_code
+            logger.info("Statuscode: {}".format(statuscode))
+            if statuscode == 200:
+                try:
+                    sonarr = r.json()
+                except json.decoder.JSONDecodeError:
+                    self.sonarr_ok = False
+                    sonarr = None
+                    # messages.warning("Sonarr connection failed.")
+                if sonarr is not None:
+                    self.sonarr_ok = True
+                else:
+                    self.sonarr_ok = False
+            else:
+                self.sonarr_ok = False
+                # messages.warning(request, "Sonarr connection failed.")
+
+        super(Setting, self).save(*args, **kwargs)
+        

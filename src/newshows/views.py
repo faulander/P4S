@@ -56,21 +56,6 @@ class FilteredShowListView(SingleTableMixin, FilterView):
 
     filterset_class = ShowFilter
 
-"""
-class ShowViewSet(viewsets.ModelViewSet):
-    API endpoint that allows Shows to be viewed or edited.
-    queryset = Show.objects.all().order_by('-premiere')
-    serializer_class = ShowSerializer
-    pagination_class = CustomPagination
-
-class UpdateSettings(ModelFormSetView):
-    model = Setting
-    fields = ['sonarr_url', 'sonarr_apikey', 'sonarr_autoadd']
-    template_name = 'settings.html'
-    success_url = '/shows'
-    factory_kwargs = {'extra': 0}
-"""
-
 
 class UpdateSettings(SuccessMessageMixin, UpdateView):
     model = Setting

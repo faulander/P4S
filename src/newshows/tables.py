@@ -1,16 +1,20 @@
 # tutorial/tables.py
 import django_tables2 as tables
-from .models import Show
+from .models import Show, Setting
 from django.utils.html import format_html
+
 
 
 class ShowTable(tables.Table):
     # Edit = tables.TemplateColumn('<input type="checkbox" value="{{ record.pk }}" />', verbose_name="Edit")
     premiere = tables.DateColumn(format="y-m-d")
- 
+
     class Meta:
+        settings = Setting.objects.get(id=1)
         model = Show
-        fields = ("name", "network", "webchannel", "genre", "language", "status", "premiere", "insonarr",)
+        fields = ("name", "network", "webchannel", "genre", "language", "status", "premiere")
+        if settings.sonarr_ok:
+            fields.append("insonarr")
 
 
     def render_name(self, value, record):
@@ -28,16 +32,11 @@ class ShowTable(tables.Table):
    
 
     def render_insonarr(self, value, record):
-        if record.thetvdb_id and not value:
-            returnstring = "<button class='btn btn-primary' id='addSonarr' value='" + str(record.thetvdb_id) + "' name='btn_addSonarr'>Add</button>"
-            return format_html(returnstring)
-        elif not record.thetvdb_id:
-            returnstring = "<button class='btn btn-secondary' id='lookupSonarr' value='" + str(record.name) + "' name='btn_addSonarr'>Lookup</button>"
-            return format_html(returnstring)
-
-    """
-    def render_premiere(self, value, record):
-        tmpPremiere = str(record.premiere)
-        tmpPremiere.split("midnight")
-        return tmpPremiere
-    """
+        settings = Setting.objects.get(id=1)
+        if settings.sonarr_ok:
+            if record.thetvdb_id and not value:
+                returnstring = "<button class='btn btn-primary' id='addSonarr' value='" + str(record.thetvdb_id) + "' name='btn_addSonarr'>Add</button>"
+                return format_html(returnstring)
+            elif not record.thetvdb_id:
+                returnstring = "<button class='btn btn-secondary' id='lookupSonarr' value='" + str(record.name) + "' name='btn_addSonarr'>Lookup</button>"
+                return format_html(returnstring)

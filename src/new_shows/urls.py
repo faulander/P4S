@@ -8,6 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 ]
 
+
 try:
     if not os.environ['firstrun'] == "1":
         # Run the Updater once on Startup
