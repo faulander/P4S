@@ -25,10 +25,10 @@ def HelperUpdateSonarr():
     sonarr_apikey = settings.sonarr_apikey
     endpoint = "/series"
     url = sonarr_url + endpoint + "?apikey=" + sonarr_apikey
-    logger.debug("Trying {}", url)
+    logger.info("Trying {}".format(url))
     r = requests.get(url)
     statuscode = r.status_code
-    logger.debug("Statuscode: {}", statuscode)
+    logger.info("Statuscode: {}".format(statuscode))
     sonarr = r.json()
     # logger.debug(sonarr)
     for s in sonarr:
@@ -69,16 +69,16 @@ def HelperUpdateTVMaze():
         page = int(settings.page)
     except:
         page = 0
-        settings.page = 0
-        settings.save()
+        #settings.page = 0
+        #settings.save()
     statuscode = 200
     # print(page)
     while statuscode == 200:  # as long as results are delivered 
         url = "http://api.tvmaze.com/shows?page=" + str(page)
-        logger.debug("Trying {}", url)
+        logger.info("Trying {}".format(url))
         r = requests.get(url)
         statuscode = r.status_code
-        logger.debug("Statuscode: {}", statuscode)
+        logger.info("Statuscode: {}".format(statuscode))
         shows = r.json()
         lstGenres = list()
         for show in shows:
@@ -152,9 +152,9 @@ def HelperUpdateTVMaze():
                 }
             )
             if created:
-                logger.info("New show added: {}", show['name'])
+                logger.info("New show added: {}".format(show['name']))
             else:
-                logger.info("Show already in DB: {}", show['name'])
+                logger.info("Show already in DB: {}".format(show['name']))
             for lstGenre in lstGenres:
                 lstGenre.shows.add(dbShow)
             dbShow.save()
@@ -240,7 +240,7 @@ def updateSingleShow(tvmaze_id):
         dbShow.thetvdb_id = show['externals']['thetvdb']
         dbShow.imdb_id = show['externals']['imdb']
         dbShow.save()
-        logger.info("Show '{}' updated.", show['name'])
+        logger.info("Show '{}' updated.".format(show['name']))
 
 
 @register_job(scheduler, "interval", hours=12, replace_existing=True)
@@ -267,20 +267,21 @@ def HelperUpdateShows():
 @register_job(scheduler, "interval", minutes=10, replace_existing=True)
 def helperGetSonarrProfiles():
     settings = Setting.objects.get(id=1)
-    sonarr_url = settings.sonarr_url
-    sonarr_apikey = settings.sonarr_apikey
-    endpoint = "/profile"
-    url = sonarr_url + endpoint + "?apikey=" + sonarr_apikey
-    logger.debug("Trying {}", url)
-    r = requests.get(url)
-    statuscode = r.status_code
-    logger.debug("Statuscode: {}", statuscode)
-    sonarr = r.json()
-    for s in sonarr:
-        dbProfile, _ = Profile.objects.get_or_create(
-            profile=s['name'],
-            profile_id=s['id']
-        )
+    if settings.sonarr_url and settings.sonarr_apikey:
+        sonarr_url = settings.sonarr_url
+        sonarr_apikey = settings.sonarr_apikey
+        endpoint = "/profile"
+        url = sonarr_url + endpoint + "?apikey=" + sonarr_apikey
+        logger.info("Trying {}".format(url))
+        r = requests.get(url)
+        statuscode = r.status_code
+        logger.info("Statuscode: {}".format(statuscode))
+        sonarr = r.json()
+        for s in sonarr:
+            dbProfile, _ = Profile.objects.get_or_create(
+                profile=s['name'],
+                profile_id=s['id']
+            )
 
 
 register_events(scheduler)
