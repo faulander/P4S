@@ -10,38 +10,49 @@ from .forms import SettingForm
 
 import requests
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
+settings = Setting.objects.get(pk=1)
 
 def AddShowToSonarr(request, thetvdb_id):
     """
     Info from Sonarr:
     Required: tvdbId (int) title (string) profileId (int) titleSlug (string) images (array) seasons (array) - See GET output for format
-
-    TODO: get ProfileId's
-    TODO: get title
-    TODO: create titleSlug
-    TODO: Create ImageArray
-    TODO: Get seasons 
-    
-    meanwhile use Lookup, endpoint /series/lookups
-    
     """
-    try:
-        sonarr_url = Settings.objects.values_list('value', flat=True).get(setting="sonarr_url")  
-        sonarr_apikey = Settings.objects.values_list('value', flat=True).get(setting="sonarr_apikey")
-    except:
-        return False
-    endpoint = "/series/lookup"
-    url = sonarr_url + endpoint + "?term=tvdb:" + str(thetvdb_id) + "&?apikey=" + sonarr_apikey
-    logger.debug("Trying {}", url)
-    r = requests.post(url)
-    statuscode = r.status_code
-    if statuscode == 200:
-        pass
-    else:
-        return False
+    if settings.sonarr_ok:
+        newshowdict = dict()
+        url = settings.sonarr_url + "/rootfolder&?apikey=" + settings.sonarr_apikey
+        logger.debug("Trying {}", url)
+        r = requests.get(url)
+        statuscode = r.status_code
+        if statuscode == 200:  # Show has been found
+            rootpath = r['path']
+        else:
+            return False
+        url = settings.sonarr_url + "/series/lookup?term=tvdb:" + str(thetvdb_id) + "&?apikey=" + settings.sonarr_apikey
+        logger.debug("Trying {}", url)
+        r = requests.get(url)
+        statuscode = r.status_code
+        if statuscode == 200:  # Show has been found
+            newshowdict['title'] = r['title']
+            newshowdict['profileId'] = r['profileId']
+            newshowdict['titleSlug'] = r['titleSlug']
+            newshowdict['seasons'] = r['seasons']
+            newshowdict['images'] = r['images']
+            newshowdict['rootFolderPath'] = rootpath
+            newshowdict['monitored'] = True
+            newshow = json.dump(newshowdict)
+            url = settings.sonarr_url + "/series&?apikey=" + settings.sonarr_apikey
+            logger.debug("Trying {}", url)
+            r = requests.post(url, newshow)
+            if r.statuscode == 200:
+                return json.dump(True)
+            else:
+                return json.dump(False)
+        else:
+            return False
 
 
 def index(request):
@@ -51,7 +62,7 @@ def index(request):
 class FilteredShowListView(SingleTableMixin, FilterView):
     model = Show
     table_class = ShowTable
-    template_name = 'show_list2.html'
+    template_name = 'show.html'
     paginate_by = 35
 
     filterset_class = ShowFilter

@@ -141,7 +141,7 @@ class Setting(models.Model):
     sonarr_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True, verbose_name="Sonarr Profile ID")
     sonarr_autoadd = models.BooleanField(default=False, verbose_name="Auto add shows to Sonarr")
     sonarr_ok = models.BooleanField(default=False, verbose_name="Settings for Sonarr ok")
-
+    
     def __str__(self):
         return "Settings"
 
