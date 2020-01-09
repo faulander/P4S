@@ -24,4 +24,4 @@ except FileNotFoundError:
         #helpers.HelperUpdateTVMaze()
         #helpers.HelperUpdateShows()
         #helpers.HelperUpdateSonarr()
-
+helpers.checkForActiveSonarr(settings.SONARR_URL, settings.SONARR_APIKEY)

@@ -1,12 +1,17 @@
 from .models import Show, ShowType, Genre, Status, Language, Country, Network, Webchannel, Profile, Setting
-import requests
 from django.utils.timezone import make_aware
-import datetime
 from django.db.models import Q
-from apscheduler.schedulers.background import BackgroundScheduler
 from django_apscheduler.jobstores import DjangoJobStore, register_events, register_job
-import pendulum
+from django.conf import settings
+
 import logging
+import json
+import datetime
+
+import requests
+import pendulum
+from apscheduler.schedulers.background import BackgroundScheduler
+
 
 """
 scheduler = BackgroundScheduler()
@@ -35,14 +40,20 @@ def _requestURL(URL, METHOD="get"):
 
 
 def checkForActiveSonarr(SONARR_URL, SONARR_APIKEY):
-        # both url and apikey are set
-        endpoint = "/system/status"
-        url = SONARR_URL + endpoint + "?apikey=" + SONARR_APIKEY
-        statuscode, sonarr = _requestURL(url)
-        if sonarr and statuscode == 200 and _is_json(sonarr):
-            return True
-        else:
-            return False
+    # both url and apikey are set
+    endpoint = "/system/status"
+    url = SONARR_URL + endpoint + "?apikey=" + SONARR_APIKEY
+    statuscode, sonarr = _requestURL(url)
+    if sonarr and statuscode == 200:
+        logger.info("Connection to Sonarr established.")
+        settings.SONARR_OK = True
+        logger.debug("SONARR_OK: {}".format(settings.SONARR_OK))
+        return True
+    else:
+        logger.error("Connection to Sonarr failed.")
+        settings.SONARR_OK = False
+        logger.debug("SONARR_OK: {}".format(settings.SONARR_OK))
+        return False
 
 
 # @register_job(scheduler, "interval", minutes=5, replace_existing=True)

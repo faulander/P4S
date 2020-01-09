@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib import messages
-from dbsettings.models import AppSettings
+# from dbsettings.models import AppSettings
 
 
 import requests
@@ -114,17 +114,6 @@ class Show(models.Model):
         verbose_name_plural = "Shows"
 
 
-class Settings(models.Model):
-    setting = models.CharField(max_length=50, blank=True, null=True, default=None)
-    value = models.CharField(max_length=100, blank=True, null=True, default=None)
-
-    def __str__(self):
-        return self.setting.__str__()
-
-    class Meta:
-        verbose_name_plural = "Settings"
-
-
 class Profile(models.Model):
     profile = models.CharField(max_length=20, blank=True, null=True, default=None)
     profile_id = models.IntegerField()
@@ -138,11 +127,6 @@ class Profile(models.Model):
 
 class Setting(models.Model):
     page = models.IntegerField()
-    sonarr_url = models.CharField(max_length=100, blank=True, null=True, default=None, verbose_name="Sonarr URL")
-    sonarr_apikey = models.CharField(max_length=50, blank=True, null=True, default=None, verbose_name="Sonarr API Key")
-    sonarr_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True, verbose_name="Sonarr Profile ID")
-    sonarr_autoadd = models.BooleanField(default=False, verbose_name="Auto add shows to Sonarr")
-    sonarr_ok = models.BooleanField(default=False, verbose_name="Settings for Sonarr ok")
     
     def __str__(self):
         return "Settings"
@@ -150,30 +134,3 @@ class Setting(models.Model):
     class Meta:
         verbose_name_plural = "Settings"
     
-
-    def save(self, *args, **kwargs):
-        if self.sonarr_url and self.sonarr_apikey:
-            # both url and apikey are set
-            endpoint = "/system/status"
-            url = self.sonarr_url + endpoint + "?apikey=" + self.sonarr_apikey
-            logger.info("Trying {}".format(url))
-            r = requests.get(url)
-            statuscode = r.status_code
-            logger.info("Statuscode: {}".format(statuscode))
-            if statuscode == 200:
-                try:
-                    sonarr = r.json()
-                except json.decoder.JSONDecodeError:
-                    self.sonarr_ok = False
-                    sonarr = None
-                    # messages.warning("Sonarr connection failed.")
-                if sonarr is not None:
-                    self.sonarr_ok = True
-                else:
-                    self.sonarr_ok = False
-            else:
-                self.sonarr_ok = False
-                # messages.warning(request, "Sonarr connection failed.")
-
-        super(Setting, self).save(*args, **kwargs)
-        

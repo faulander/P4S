@@ -2,6 +2,8 @@ import os
 import sys
 import logging.config
 from django.contrib.messages import constants as messages
+from newshows.helpers import checkForActiveSonarr
+from django.core.management.utils import get_random_secret_key
 # from newshows.helpers import checkForActiveSonarr, _requestURL, _is_json
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -11,14 +13,14 @@ SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__f
 DEBUG = os.getenv('DEBUG', 'True')
 SECRET_KEY = os.getenv('SECRET_KEY', "kefdjsfjmq9r3urweqmr93")
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(',')
-LOGLEVEL = os.getenv('LOGLEVEL', 'info').upper()
+LOGLEVEL = os.getenv('LOGLEVEL', 'debug').upper()
 SONARR_URL = os.getenv('SONARR_URL')
 SONARR_APIKEY = os.getenv('SONARR_APIKEY')
+SECRET_KEY = get_random_secret_key()
 
 if not SONARR_URL and not SONARR_APIKEY:
     sys.exit("Environment variables SONARR_URL or SONARR_APIKEY are not set.")
 
-SONARR_OK = True
 
 
 # Application definition
@@ -34,7 +36,7 @@ INSTALLED_APPS = [
     'extra_views',
     'crispy_forms',
     'newshows',
-    "django_apscheduler",
+    'django_apscheduler'
 
 ]
 
