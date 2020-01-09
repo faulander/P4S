@@ -7,6 +7,7 @@ from .models import Show, Setting
 from .tables import ShowTable
 from .filters import ShowFilter
 from .forms import SettingForm
+from settings import SONARR_OK
 
 import requests
 import logging
@@ -21,7 +22,7 @@ def AddShowToSonarr(request, thetvdb_id):
     Info from Sonarr:
     Required: tvdbId (int) title (string) profileId (int) titleSlug (string) images (array) seasons (array) - See GET output for format
     """
-    if settings.sonarr_ok:
+    if SONARR_OK:
         newshowdict = dict()
         url = settings.sonarr_url + "/rootfolder&?apikey=" + settings.sonarr_apikey
         logger.debug("Trying {}", url)

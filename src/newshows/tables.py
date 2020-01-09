@@ -2,7 +2,7 @@
 import django_tables2 as tables
 from .models import Show, Setting
 from django.utils.html import format_html
-
+from settings import SONARR_OK
 
 
 class ShowTable(tables.Table):
@@ -10,10 +10,9 @@ class ShowTable(tables.Table):
     premiere = tables.DateColumn(format="y-m-d")
 
     class Meta:
-        settings = Setting.objects.get(id=1)
         model = Show
         fields = ("name", "network", "webchannel", "genre", "language", "status", "premiere")
-        if settings.sonarr_ok:
+        if SONARR_OK:
             fields.append("insonarr")
 
 
@@ -29,11 +28,10 @@ class ShowTable(tables.Table):
             returnstring += "<a href='https://thetvdb.com/search?query=" + record.thetvdb_id + "'><img src='/static/img/thetvdb.ico' height='20px'></a>"
         returnstring = "<strong>" + value + "</strong><br />" + returnstring
         return format_html(returnstring)
-   
+
 
     def render_insonarr(self, value, record):
-        settings = Setting.objects.get(id=1)
-        if settings.sonarr_ok:
+        if SONARR_OK:
             if record.thetvdb_id and not value:
                 returnstring = "<button class='btn btn-primary' id='addSonarr' value='" + str(record.thetvdb_id) + "' name='btn_addSonarr'>Add</button>"
                 return format_html(returnstring)

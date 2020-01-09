@@ -1,18 +1,28 @@
 import os
+import sys
 import logging.config
 from django.contrib.messages import constants as messages
-
+from newshows.helpers import checkForActiveSonarr
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-DEBUG = os.getenv('DEBUG', "True")
+#CONSTANTS
+DEBUG = os.getenv('DEBUG', 'True')
 SECRET_KEY = os.getenv('SECRET_KEY')
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(',')
 LOGLEVEL = os.getenv('LOGLEVEL', 'info').upper()
+SONARR_URL = os.getenv('SONARR_URL')
+SONARR_APIKEY = os.getenv('SONARR_APIKEY')
+
+if not SONARR_URL and not SONARR_APIKEY:
+    sys.exit("Environment variables SONARR_URL or SONARR_APIKEY are not set.")
+else:
+    SONARR_ISOK = checkForActiveSonarr(SONARR_URL, SONARR_APIKEY)
+
+
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

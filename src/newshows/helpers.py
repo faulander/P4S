@@ -1,4 +1,4 @@
-from .models import Show, ShowType, Genre, Status, Language, Country, Network, Webchannel, Profile, Setting
+from .models import Show, ShowType, Genre, Status, Language, Country, Network, Webchannel, Profile
 import requests
 from django.utils.timezone import make_aware
 import datetime
@@ -8,29 +8,53 @@ from django_apscheduler.jobstores import DjangoJobStore, register_events, regist
 import pendulum
 import logging
 
+"""
 scheduler = BackgroundScheduler()
 scheduler.add_jobstore(DjangoJobStore(), "default")
+"""
 
 logger = logging.getLogger(__name__)
 
 
-@register_job(scheduler, "interval", minutes=5, replace_existing=True)
+def _is_json(myjson):
+  try:
+    json_object = json.loads(myjson)
+  except ValueError as e:
+    return False
+  return True
+
+def _requestURL(URL, METHOD="get")
+    logger.info("Trying {}".format(URL))
+    r = requests.get(url)
+    try:
+        retValue = r.json()
+    except:
+        return False, False
+    return r.status_code, retValue
+
+
+def checkForActiveSonarr(SONARR_URL, SONARR_APIKEY):
+        # both url and apikey are set
+        endpoint = "/system/status"
+        url = SONARR_URL + endpoint + "?apikey=" + SONARR_APIKEY
+        statuscode, sonarr = _requestURL(url)
+        if sonarr and statuscode == 200 and _is_json(sonarr):
+            return True
+        else:
+            return False
+
+
+# @register_job(scheduler, "interval", minutes=5, replace_existing=True)
 def HelperUpdateSonarr():
     """
     Gets the complete list of shows in Sonarr API
     If a show is found, the column 'insonarr' is set to true
     """
-    settings = Setting.objects.get(id=1)
-    sonarr_url = settings.sonarr_url
-    sonarr_apikey = settings.sonarr_apikey
-    if settings.sonarr_ok:
+ 
+    if SONARR_OK:
         endpoint = "/series"
         url = sonarr_url + endpoint + "?apikey=" + sonarr_apikey
-        logger.info("Trying {}".format(url))
-        r = requests.get(url)
-        statuscode = r.status_code
-        logger.info("Statuscode: {}".format(statuscode))
-        sonarr = r.json()
+        statuscode, sonarr = _requestURL(url)
         # logger.debug(sonarr)
         for s in sonarr:
             try:
@@ -58,7 +82,7 @@ def HelperUpdateSonarr():
             ).update(insonarr=True)
 
 
-@register_job(scheduler, "interval", hours=24, replace_existing=True)
+# @register_job(scheduler, "interval", hours=24, replace_existing=True)
 def HelperUpdateTVMaze():
     """
     TVMazes update API provides tv shows in paged manner,
@@ -73,11 +97,7 @@ def HelperUpdateTVMaze():
     statuscode = 200
     while statuscode == 200:  # as long as results are delivered
         url = "http://api.tvmaze.com/shows?page=" + str(page)
-        logger.info("Trying {}".format(url))
-        r = requests.get(url)
-        statuscode = r.status_code
-        logger.info("Statuscode: {}".format(statuscode))
-        shows = r.json()
+        statuscode, shows = _requestURL(url)
         lstGenres = list()
         for show in shows:
             if show['language'] is not None:
@@ -236,7 +256,7 @@ def updateSingleShow(tvmaze_id):
         logger.info("Show '{}' updated.".format(show['name']))
 
 
-@register_job(scheduler, "interval", hours=12, replace_existing=True)
+# @register_job(scheduler, "interval", hours=12, replace_existing=True)
 def HelperUpdateShows():
     url = "http://api.tvmaze.com/updates/shows"
     r = requests.get(url)
@@ -256,25 +276,20 @@ def HelperUpdateShows():
             except KeyError:
                 pass
 
-@register_job(scheduler, "interval", minutes=10, replace_existing=True)
+# @register_job(scheduler, "interval", minutes=10, replace_existing=True)
 def helperGetSonarrProfiles():
     settings = Setting.objects.get(id=1)
-    if settings.sonarr_ok:
-        sonarr_url = settings.sonarr_url
-        sonarr_apikey = settings.sonarr_apikey
+    if SONARR_OK:
         endpoint = "/profile"
         url = sonarr_url + endpoint + "?apikey=" + sonarr_apikey
-        logger.info("Trying {}".format(url))
-        r = requests.get(url)
-        statuscode = r.status_code
-        logger.info("Statuscode: {}".format(statuscode))
-        sonarr = r.json()
+        statuscode, sonarr = _requestURL(url)
         for s in sonarr:
             dbProfile, _ = Profile.objects.get_or_create(
                 profile=s['name'],
                 profile_id=s['id']
             )
 
-
+"""
 register_events(scheduler)
 scheduler.start()
+"""

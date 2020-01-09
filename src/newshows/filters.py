@@ -1,7 +1,6 @@
 from .models import Show, Setting
 import django_filters
-
-settings = Setting.objects.get(pk=1)
+from settings import SONARR_OK
 
 class ShowFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains')
@@ -10,13 +9,13 @@ class ShowFilter(django_filters.FilterSet):
     class Meta:
         model = Show
         fields = ['name', 'network', 'webchannel', 'language', 'genre', 'premiere', 'imdb_id', 'status']
-        if settings.sonarr_ok:
+        if SONARR_OK:
             fields.append('insonarr')
             fields.append('ignored')
 
     def __init__(self, *args, **kwargs):
         super(ShowFilter, self).__init__(*args, **kwargs)
-        if settings.sonarr_ok:
+        if SONARR_OK:
             self.filters['insonarr'].label="Show added to Sonarr?"
             self.filters['ignored'].label="Ignored?"
        
