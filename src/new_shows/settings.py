@@ -9,7 +9,7 @@ SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__f
 
 #CONSTANTS
 DEBUG = os.getenv('DEBUG', 'True')
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', "kefdjsfjmq9r3urweqmr93")
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(',')
 LOGLEVEL = os.getenv('LOGLEVEL', 'info').upper()
 SONARR_URL = os.getenv('SONARR_URL')
@@ -141,7 +141,7 @@ logging.config.dictConfig({
     'disable_existing_loggers': False,
     'formatters': {
         'console': {
-            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s',
+            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(message)s',
         },
     },
     'handlers': {

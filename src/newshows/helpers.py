@@ -82,6 +82,17 @@ def HelperUpdateSonarr():
                 Q(imdb_id=s_imdb)
             ).update(insonarr=True)
 
+def threadHelperUpdateTVMaze():
+    logger.info("Getting 40k shows from TV Maze")
+    import threading
+    t = threading.Thread(target=HelperUpdateTVMaze, args=(), kwargs={})
+    t.setDaemon(True)
+    t.start()
+    f = open(".firstrun.done","w+")
+    f.write("Firstrun done.")
+    f.close()
+
+
 
 # @register_job(scheduler, "interval", hours=24, replace_existing=True)
 def HelperUpdateTVMaze():
