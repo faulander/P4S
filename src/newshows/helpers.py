@@ -1,4 +1,4 @@
-from .models import Show, ShowType, Genre, Status, Language, Country, Network, Webchannel, Profile
+from .models import Show, ShowType, Genre, Status, Language, Country, Network, Webchannel, Profile, Setting
 import requests
 from django.utils.timezone import make_aware
 import datetime
@@ -23,9 +23,10 @@ def _is_json(myjson):
     return False
   return True
 
-def _requestURL(URL, METHOD="get")
+def _requestURL(URL, METHOD="get"):
     logger.info("Trying {}".format(URL))
-    r = requests.get(url)
+    if METHOD == "get":
+        r = requests.get(URL)
     try:
         retValue = r.json()
     except:
@@ -89,10 +90,9 @@ def HelperUpdateTVMaze():
     every page contains 250 shows, leaving spaces if shows are deleted.
     the updateTvMaze function catches up from last run and gets the new shows.
     """
-    try:
-        settings = Setting.objects.get(id=1)
-        page = int(settings.page)
-    except:
+    settings = Setting.objects.get(id=1)
+    page = int(settings.page)
+    if not page:
         page = 0
     statuscode = 200
     while statuscode == 200:  # as long as results are delivered

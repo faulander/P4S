@@ -2,7 +2,7 @@
 import django_tables2 as tables
 from .models import Show, Setting
 from django.utils.html import format_html
-from settings import SONARR_OK
+from django.conf import settings
 
 
 class ShowTable(tables.Table):
@@ -12,8 +12,8 @@ class ShowTable(tables.Table):
     class Meta:
         model = Show
         fields = ("name", "network", "webchannel", "genre", "language", "status", "premiere")
-        if SONARR_OK:
-            fields.append("insonarr")
+        if settings.SONARR_OK:
+            fields += ("insonarr",)
 
 
     def render_name(self, value, record):
@@ -31,7 +31,7 @@ class ShowTable(tables.Table):
 
 
     def render_insonarr(self, value, record):
-        if SONARR_OK:
+        if settings.SONARR_OK:
             if record.thetvdb_id and not value:
                 returnstring = "<button class='btn btn-primary' id='addSonarr' value='" + str(record.thetvdb_id) + "' name='btn_addSonarr'>Add</button>"
                 return format_html(returnstring)

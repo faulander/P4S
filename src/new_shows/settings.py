@@ -2,7 +2,7 @@ import os
 import sys
 import logging.config
 from django.contrib.messages import constants as messages
-from newshows.helpers import checkForActiveSonarr
+# from newshows.helpers import checkForActiveSonarr, _requestURL, _is_json
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -17,9 +17,8 @@ SONARR_APIKEY = os.getenv('SONARR_APIKEY')
 
 if not SONARR_URL and not SONARR_APIKEY:
     sys.exit("Environment variables SONARR_URL or SONARR_APIKEY are not set.")
-else:
-    SONARR_ISOK = checkForActiveSonarr(SONARR_URL, SONARR_APIKEY)
 
+SONARR_OK = True
 
 
 # Application definition
@@ -30,12 +29,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "django_apscheduler",
     'django_tables2',
     'django_filters',
     'extra_views',
     'crispy_forms',
-    'newshows'
+    'newshows',
+    "django_apscheduler",
+
 ]
 
 MIDDLEWARE = [

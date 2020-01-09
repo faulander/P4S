@@ -124,7 +124,7 @@ class Profile(models.Model):
 
 
 class Setting(models.Model):
-    page = models.CharField(max_length=20, blank=True, null=True, default=0)
+    page = models.IntegerField(blank=True, null=True, default=0)
 
     def __str__(self):
         return self.Setting.__str__()

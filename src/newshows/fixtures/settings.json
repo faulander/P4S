@@ -1,0 +1,9 @@
+[
+  {
+    "model": "newshows.setting",
+    "pk": 1,
+    "fields": {
+      "page": 0
+    }
+  }
+]

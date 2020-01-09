@@ -6,16 +6,13 @@ from django.contrib.messages.views import SuccessMessageMixin
 from .models import Show, Setting
 from .tables import ShowTable
 from .filters import ShowFilter
-from .forms import SettingForm
-from settings import SONARR_OK
+from django.conf import settings
 
 import requests
 import logging
 import json
 
 logger = logging.getLogger(__name__)
-
-settings = Setting.objects.get(pk=1)
 
 def AddShowToSonarr(request, thetvdb_id):
     """
@@ -24,7 +21,7 @@ def AddShowToSonarr(request, thetvdb_id):
     """
     if SONARR_OK:
         newshowdict = dict()
-        url = settings.sonarr_url + "/rootfolder&?apikey=" + settings.sonarr_apikey
+        url = settings.SONARR_URL + "/rootfolder&?apikey=" + settings.SONARR_APIKEY
         logger.debug("Trying {}", url)
         r = requests.get(url)
         statuscode = r.status_code
@@ -67,13 +64,3 @@ class FilteredShowListView(SingleTableMixin, FilterView):
     paginate_by = 35
 
     filterset_class = ShowFilter
-
-
-class UpdateSettings(SuccessMessageMixin, UpdateView):
-    model = Setting
-    form_class = SettingForm
-    template_name = 'settings.html'
-    success_message = "Settings saved"
-
-    def get_object(self):
-        return Setting.objects.get(pk=1)
