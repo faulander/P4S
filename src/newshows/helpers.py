@@ -22,11 +22,11 @@ logger = logging.getLogger(__name__)
 
 
 def _is_json(myjson):
-  try:
-    json_object = json.loads(myjson)
-  except ValueError as e:
-    return False
-  return True
+    try:
+        json_object = json.loads(myjson)
+    except ValueError as e:
+        return False
+    return True
 
 def _requestURL(URL, METHOD="get"):
     logger.info("Trying {}".format(URL))
@@ -92,17 +92,6 @@ def HelperUpdateSonarr():
                 Q(thetvdb_id=s_thetvdb) |
                 Q(imdb_id=s_imdb)
             ).update(insonarr=True)
-
-def threadHelperUpdateTVMaze():
-    logger.info("Getting 40k shows from TV Maze")
-    import threading
-    t = threading.Thread(target=HelperUpdateTVMaze, args=(), kwargs={})
-    t.setDaemon(True)
-    t.start()
-    f = open(".firstrun.done","w+")
-    f.write("Firstrun done.")
-    f.close()
-
 
 
 # @register_job(scheduler, "interval", hours=24, replace_existing=True)

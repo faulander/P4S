@@ -18,10 +18,10 @@ urlpatterns = [
 try:
     f = open(".firstrun.done")
 except FileNotFoundError:
+    logger.info("Empty db found.")
     if "newshows_show" in connection.introspection.table_names() and Setting.objects.filter(pk=1).exists():
         logger.info("Initial Setup starting.")
-        helpers.threadHelperUpdateTVMaze()
-        #helpers.HelperUpdateTVMaze()
+        helpers.HelperUpdateTVMaze()
         #helpers.HelperUpdateShows()
         #helpers.HelperUpdateSonarr()
-helpers.checkForActiveSonarr(settings.SONARR_URL, settings.SONARR_APIKEY)
+#helpers.checkForActiveSonarr(settings.SONARR_URL, settings.SONARR_APIKEY)
