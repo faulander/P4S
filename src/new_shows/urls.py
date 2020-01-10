@@ -22,6 +22,6 @@ except FileNotFoundError:
     if "newshows_show" in connection.introspection.table_names() and Setting.objects.filter(pk=1).exists():
         logger.info("Initial Setup starting.")
         helpers.HelperUpdateTVMaze()
-        #helpers.HelperUpdateShows()
-        #helpers.HelperUpdateSonarr()
-#helpers.checkForActiveSonarr(settings.SONARR_URL, settings.SONARR_APIKEY)
+        # helpers.HelperUpdateShows()
+        # helpers.HelperUpdateSonarr()
+# helpers.checkForActiveSonarr(settings.SONARR_URL, settings.SONARR_APIKEY)

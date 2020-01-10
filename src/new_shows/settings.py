@@ -8,7 +8,7 @@ from django.core.management.utils import get_random_secret_key
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-#CONSTANTS
+# CONSTANTS
 DEBUG = os.getenv('DEBUG', 'True')
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(',')
 LOGLEVEL = os.getenv('LOGLEVEL', 'ERROR').upper()
@@ -19,7 +19,6 @@ SONARR_OK = False
 
 if not SONARR_URL and not SONARR_APIKEY:
     sys.exit("Environment variables SONARR_URL or SONARR_APIKEY are not set.")
-
 
 
 # Application definition
@@ -154,7 +153,7 @@ logging.config.dictConfig({
     'loggers': {
         '': {
             'level': LOGLEVEL,
-            'handlers': ['console',],
+            'handlers': ['console', ],
         },
     },
 })

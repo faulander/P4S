@@ -62,10 +62,10 @@ def HelperUpdateSonarr():
     Gets the complete list of shows in Sonarr API
     If a show is found, the column 'insonarr' is set to true
     """
- 
-    if SONARR_OK:
+
+    if settings.SONARR_OK:
         endpoint = "/series"
-        url = sonarr_url + endpoint + "?apikey=" + sonarr_apikey
+        url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
         statuscode, sonarr = _requestURL(url)
         # logger.debug(sonarr)
         for s in sonarr:
@@ -290,9 +290,9 @@ def HelperUpdateShows():
 # @register_job(scheduler, "interval", minutes=10, replace_existing=True)
 def helperGetSonarrProfiles():
     settings = Setting.objects.get(id=1)
-    if SONARR_OK:
+    if settings.SONARR_OK:
         endpoint = "/profile"
-        url = sonarr_url + endpoint + "?apikey=" + sonarr_apikey
+        url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
         statuscode, sonarr = _requestURL(url)
         for s in sonarr:
             dbProfile, _ = Profile.objects.get_or_create(
