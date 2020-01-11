@@ -40,7 +40,6 @@ class Genre(models.Model):
         verbose_name_plural = "Genres"
 
 
-
 class Status(models.Model):
     status = models.CharField(max_length=30)
 
@@ -104,7 +103,6 @@ class Show(models.Model):
     imdb_id = models.CharField(max_length=10, blank=True, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    ignored = models.BooleanField(default=False, verbose_name="I")
     insonarr = models.BooleanField(default=False, verbose_name="S")
 
     def __str__(self):
@@ -133,4 +131,3 @@ class Setting(models.Model):
 
     class Meta:
         verbose_name_plural = "Settings"
-    

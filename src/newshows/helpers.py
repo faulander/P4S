@@ -1,7 +1,6 @@
 from .models import Show, ShowType, Genre, Status, Language, Country, Network, Webchannel, Profile, Setting
 from django.utils.timezone import make_aware
 from django.db.models import Q
-from django_apscheduler.jobstores import DjangoJobStore, register_events, register_job
 from django.conf import settings
 
 import logging
@@ -10,13 +9,9 @@ import datetime
 
 import requests
 import pendulum
-from apscheduler.schedulers.background import BackgroundScheduler
+from huey import crontab
+from huey.contrib.djhuey import db_periodic_task, db_task
 
-
-"""
-scheduler = BackgroundScheduler()
-scheduler.add_jobstore(DjangoJobStore(), "default")
-"""
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +51,6 @@ def checkForActiveSonarr(SONARR_URL, SONARR_APIKEY):
         return False
 
 
-# @register_job(scheduler, "interval", minutes=5, replace_existing=True)
 def HelperUpdateSonarr():
     """
     Gets the complete list of shows in Sonarr API
@@ -94,7 +88,8 @@ def HelperUpdateSonarr():
             ).update(insonarr=True)
 
 
-# @register_job(scheduler, "interval", hours=24, replace_existing=True)
+@db_task()
+@db_periodic_task(crontab(hour='*/3'))
 def HelperUpdateTVMaze():
     """
     TVMazes update API provides tv shows in paged manner,
@@ -266,8 +261,7 @@ def updateSingleShow(tvmaze_id):
         dbShow.save()
         logger.info("Show '{}' updated.".format(show['name']))
 
-
-# @register_job(scheduler, "interval", hours=12, replace_existing=True)
+@db_periodic_task(crontab(hour='*/24'))
 def HelperUpdateShows():
     url = "http://api.tvmaze.com/updates/shows"
     r = requests.get(url)
@@ -287,20 +281,14 @@ def HelperUpdateShows():
             except KeyError:
                 pass
 
-# @register_job(scheduler, "interval", minutes=10, replace_existing=True)
+@db_periodic_task(crontab(minute='*/5'))
 def helperGetSonarrProfiles():
-    settings = Setting.objects.get(id=1)
-    if settings.SONARR_OK:
-        endpoint = "/profile"
-        url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
-        statuscode, sonarr = _requestURL(url)
-        for s in sonarr:
-            dbProfile, _ = Profile.objects.get_or_create(
-                profile=s['name'],
-                profile_id=s['id']
-            )
-
-"""
-register_events(scheduler)
-scheduler.start()
-"""
+    endpoint = "/profile"
+    url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
+    statuscode, sonarr = _requestURL(url)
+    Profile.objects.all().delete()  # First delete all current profiles
+    for s in sonarr:
+        dbProfile, _ = Profile.objects.get_or_create(
+            profile=s['name'],
+            profile_id=s['id']
+        )

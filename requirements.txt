@@ -1,10 +1,8 @@
-
 Django
-django-apscheduler
 django-crispy-forms
 django-extra-views
 django-filter
 django-tables2
-APScheduler
 pendulum
 requests
+huey

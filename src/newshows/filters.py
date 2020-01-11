@@ -1,4 +1,4 @@
-from .models import Show, Setting
+from .models import Show
 import django_filters
 from django.conf import settings
 
@@ -8,14 +8,8 @@ class ShowFilter(django_filters.FilterSet):
 
     class Meta:
         model = Show
-        fields = ['name', 'network', 'webchannel', 'language', 'genre', 'premiere', 'imdb_id', 'status']
-        if settings.SONARR_OK:
-            fields.append('insonarr')
-            fields.append('ignored')
+        fields = ['name', 'network', 'webchannel', 'language', 'genre', 'premiere', 'imdb_id', 'status', 'insonarr']
 
     def __init__(self, *args, **kwargs):
         super(ShowFilter, self).__init__(*args, **kwargs)
-        if settings.SONARR_OK:
-            self.filters['insonarr'].label="Show added to Sonarr?"
-            self.filters['ignored'].label="Ignored?"
-       
+        self.filters['insonarr'].label = "Show added to Sonarr?"

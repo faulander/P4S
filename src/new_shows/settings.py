@@ -2,8 +2,9 @@ import os
 import sys
 import logging.config
 from django.contrib.messages import constants as messages
-# from newshows.helpers import checkForActiveSonarr
 from django.core.management.utils import get_random_secret_key
+from huey import SqliteHuey
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -11,7 +12,7 @@ SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__f
 # CONSTANTS
 DEBUG = os.getenv('DEBUG', 'True')
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(',')
-LOGLEVEL = os.getenv('LOGLEVEL', 'ERROR').upper()
+LOGLEVEL = os.getenv('LOGLEVEL', 'info').upper()
 SONARR_URL = os.getenv('SONARR_URL')
 SONARR_APIKEY = os.getenv('SONARR_APIKEY')
 SECRET_KEY = get_random_secret_key()
@@ -19,7 +20,6 @@ SONARR_OK = False
 
 if not SONARR_URL and not SONARR_APIKEY:
     sys.exit("Environment variables SONARR_URL or SONARR_APIKEY are not set.")
-
 
 # Application definition
 INSTALLED_APPS = [
@@ -33,9 +33,8 @@ INSTALLED_APPS = [
     'django_filters',
     'extra_views',
     'crispy_forms',
+    'huey.contrib.djhuey',
     'newshows',
-    'django_apscheduler'
-
 ]
 
 MIDDLEWARE = [
@@ -138,6 +137,7 @@ MESSAGE_TAGS = {
 
 logging.config.dictConfig({
     'version': 1,
+    
     'disable_existing_loggers': False,
     'formatters': {
         'console': {
@@ -157,3 +157,20 @@ logging.config.dictConfig({
         },
     },
 })
+
+#  HUEY = SqliteHuey(filename='crontasks.db')
+
+HUEY = {
+    'huey_class': 'huey.SqliteHuey',  # Huey implementation to use.
+    'filename': 'crontasks.db',  # Use db name for huey.
+    'results': True,  # Store return values of tasks.
+    'store_none': False,  # If a task returns None, do not save to results.
+    'immediate': False,  # If DEBUG=True, run synchronously.
+    'consumer': {
+        'workers': 1,
+        'worker_type': 'thread',
+        'periodic': True,  # Enable crontab feature.
+        'check_worker_health': True,  # Enable worker health checks.
+        'health_check_interval': 1,  # Check worker health every second.
+    },
+}

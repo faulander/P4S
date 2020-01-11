@@ -42,11 +42,6 @@
                 {{ filter.form.insonarr|as_crispy_field }}
             </div>
         {% endif %}
-        {% if filter.form.ignored %}
-            <div class="form-group col-md-3 mb-0">
-                {{ filter.form.ignored|as_crispy_field }}
-           </div>
-        {% endif %}
         </div>
 
     <button type="submit" class="btn btn-primary">Filter</button>
