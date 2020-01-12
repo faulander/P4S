@@ -11,10 +11,8 @@ class ShowTable(tables.Table):
 
     class Meta:
         model = Show
-        fields = ("name", "network", "webchannel", "genre", "language", "status", "premiere")
-        if settings.SONARR_OK:
-            fields += ("insonarr",)
-
+        fields = ("name", "network", "webchannel", "genre", "language", "status", "premiere", "insonarr")
+ 
     def render_name(self, value, record):
         returnstring = ""
         if record.tvmaze_id:
@@ -30,8 +28,8 @@ class ShowTable(tables.Table):
 
     def render_insonarr(self, value, record):
         if record.thetvdb_id and not value:
-            returnstring = "<button class='btn btn-primary' id='addSonarr' value='" + str(record.thetvdb_id) + "' name='btn_addSonarr'>Add</button>"
+            returnstring = "<button class='btn btn-primary addSonarr' value='" + str(record.thetvdb_id) + "' name='btn_addSonarr'>Add</button>"
             return format_html(returnstring)
         elif not record.thetvdb_id:
-            returnstring = "<button class='btn btn-secondary' id='lookupSonarr' value='" + str(record.name) + "' name='btn_addSonarr'>Lookup</button>"
+            returnstring = "<button class='btn btn-secondary lookupSonarr' value='" + str(record.name) + "' name='btn_addSonarr'>Lookup</button>"
             return format_html(returnstring)

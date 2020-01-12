@@ -126,6 +126,8 @@ class Profile(models.Model):
 class Setting(models.Model):
     page = models.IntegerField()
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True, default=None)
+    addmonitored = models.BooleanField(default=True, verbose_name="Add shows as monitored to Sonnar")
+    seasonfolders = models.BooleanField(default=True, verbose_name="Subfolders for seasons")
     
     def __str__(self):
         return "Settings"

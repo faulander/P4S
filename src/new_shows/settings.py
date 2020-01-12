@@ -17,6 +17,7 @@ SONARR_URL = os.getenv('SONARR_URL')
 SONARR_APIKEY = os.getenv('SONARR_APIKEY')
 SECRET_KEY = get_random_secret_key()
 SONARR_OK = False
+SONARR_ROOTFOLDER = ""
 
 if not SONARR_URL and not SONARR_APIKEY:
     sys.exit("Environment variables SONARR_URL or SONARR_APIKEY are not set.")

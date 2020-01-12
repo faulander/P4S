@@ -23,6 +23,8 @@ if not settings.SONARR_OK:
 
 if os.path.isfile(".firstrun.done"):
     logger.info("It's not the first run of P4S.")
+    logger.info("Still running update from Sonarr")
+    helpers.HelperUpdateSonarr()
 else:
     logger.info("Empty db found.")
     if "newshows_show" in connection.introspection.table_names() and Setting.objects.filter(pk=1).exists():

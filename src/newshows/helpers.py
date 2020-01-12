@@ -37,20 +37,20 @@ def _requestURL(URL, METHOD="get"):
 def checkForActiveSonarr(SONARR_URL, SONARR_APIKEY):
     # both url and apikey are set
     endpoint = "/system/status"
-    url = SONARR_URL + endpoint + "?apikey=" + SONARR_APIKEY
+    url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
     statuscode, sonarr = _requestURL(url)
     if sonarr and statuscode == 200:
         logger.info("Connection to Sonarr established.")
         settings.SONARR_OK = True
-        logger.debug("SONARR_OK: {}".format(settings.SONARR_OK))
+        logger.info("SONARR_OK: {}".format(settings.SONARR_OK))
         return True
     else:
         logger.error("Connection to Sonarr failed.")
         settings.SONARR_OK = False
-        logger.debug("SONARR_OK: {}".format(settings.SONARR_OK))
+        logger.info("SONARR_OK: {}".format(settings.SONARR_OK))
         return False
 
-
+@db_periodic_task(crontab(minute='*/5'))
 def HelperUpdateSonarr():
     """
     Gets the complete list of shows in Sonarr API
