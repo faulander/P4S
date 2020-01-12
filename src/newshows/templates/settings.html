@@ -5,7 +5,7 @@
 {% block content %}
     <form method="post">
         {% csrf_token %}
-        {{ form|crispy }}
+        {{ formset|crispy }}
         <button class="btn btn-success">Change</button>
     </form>
 {% endblock %}

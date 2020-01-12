@@ -125,6 +125,7 @@ class Profile(models.Model):
 
 class Setting(models.Model):
     page = models.IntegerField()
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True, default=None)
     
     def __str__(self):
         return "Settings"

@@ -15,7 +15,6 @@ class ShowTable(tables.Table):
         if settings.SONARR_OK:
             fields += ("insonarr",)
 
-
     def render_name(self, value, record):
         returnstring = ""
         if record.tvmaze_id:
@@ -29,12 +28,10 @@ class ShowTable(tables.Table):
         returnstring = "<strong>" + value + "</strong><br />" + returnstring
         return format_html(returnstring)
 
-
     def render_insonarr(self, value, record):
-        if settings.SONARR_OK:
-            if record.thetvdb_id and not value:
-                returnstring = "<button class='btn btn-primary' id='addSonarr' value='" + str(record.thetvdb_id) + "' name='btn_addSonarr'>Add</button>"
-                return format_html(returnstring)
-            elif not record.thetvdb_id:
-                returnstring = "<button class='btn btn-secondary' id='lookupSonarr' value='" + str(record.name) + "' name='btn_addSonarr'>Lookup</button>"
-                return format_html(returnstring)
+        if record.thetvdb_id and not value:
+            returnstring = "<button class='btn btn-primary' id='addSonarr' value='" + str(record.thetvdb_id) + "' name='btn_addSonarr'>Add</button>"
+            return format_html(returnstring)
+        elif not record.thetvdb_id:
+            returnstring = "<button class='btn btn-secondary' id='lookupSonarr' value='" + str(record.name) + "' name='btn_addSonarr'>Lookup</button>"
+            return format_html(returnstring)

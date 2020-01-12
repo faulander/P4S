@@ -11,6 +11,7 @@ from django.conf import settings
 import requests
 import logging
 import json
+from extra_views import ModelFormSetView
 
 logger = logging.getLogger(__name__)
 
@@ -19,42 +20,37 @@ def AddShowToSonarr(request, thetvdb_id):
     Info from Sonarr:
     Required: tvdbId (int) title (string) profileId (int) titleSlug (string) images (array) seasons (array) - See GET output for format
     """
-    if SONARR_OK:
-        newshowdict = dict()
-        url = settings.SONARR_URL + "/rootfolder&?apikey=" + settings.SONARR_APIKEY
+    newshowdict = dict()
+    url = settings.SONARR_URL + "/rootfolder&?apikey=" + settings.SONARR_APIKEY
+    logger.debug("Trying {}", url)
+    r = requests.get(url)
+    statuscode = r.status_code
+    if statuscode == 200:  # Show has been found
+        rootpath = r['path']
+    else:
+        return json.dump(False)
+    url = settings.sonarr_url + "/series/lookup?term=tvdb:" + str(thetvdb_id) + "&?apikey=" + settings.sonarr_apikey
+    logger.debug("Trying {}", url)
+    r = requests.get(url)
+    statuscode = r.status_code
+    if statuscode == 200:  # Show has been found
+        newshowdict['title'] = r['title']
+        newshowdict['profileId'] = r['profileId']
+        newshowdict['titleSlug'] = r['titleSlug']
+        newshowdict['seasons'] = r['seasons']
+        newshowdict['images'] = r['images']
+        newshowdict['rootFolderPath'] = rootpath
+        newshowdict['monitored'] = True
+        newshow = json.dump(newshowdict)
+        url = settings.sonarr_url + "/series&?apikey=" + settings.sonarr_apikey
         logger.debug("Trying {}", url)
-        r = requests.get(url)
-        statuscode = r.status_code
-        if statuscode == 200:  # Show has been found
-            rootpath = r['path']
+        r = requests.post(url, newshow)
+        if r.statuscode == 200:
+            return json.dump(True)
         else:
-            return False
-        url = settings.sonarr_url + "/series/lookup?term=tvdb:" + str(thetvdb_id) + "&?apikey=" + settings.sonarr_apikey
-        logger.debug("Trying {}", url)
-        r = requests.get(url)
-        statuscode = r.status_code
-        if statuscode == 200:  # Show has been found
-            newshowdict['title'] = r['title']
-            newshowdict['profileId'] = r['profileId']
-            newshowdict['titleSlug'] = r['titleSlug']
-            newshowdict['seasons'] = r['seasons']
-            newshowdict['images'] = r['images']
-            newshowdict['rootFolderPath'] = rootpath
-            newshowdict['monitored'] = True
-            newshow = json.dump(newshowdict)
-            url = settings.sonarr_url + "/series&?apikey=" + settings.sonarr_apikey
-            logger.debug("Trying {}", url)
-            r = requests.post(url, newshow)
-            if r.statuscode == 200:
-                return json.dump(True)
-            else:
-                return json.dump(False)
-        else:
-            return False
-
-
-def index(request):
-    return HttpResponse("Hello, world. You're at the new show index.")
+            return json.dump(False)
+    else:
+        return json.dump(False)
 
 
 class FilteredShowListView(SingleTableMixin, FilterView):
@@ -64,3 +60,11 @@ class FilteredShowListView(SingleTableMixin, FilterView):
     paginate_by = 35
 
     filterset_class = ShowFilter
+
+
+class SettingsFormSetView(ModelFormSetView):
+    model = Setting
+    fields = ['profile']
+    template_name = 'settings.html'
+    factory_kwargs = {'extra': 0}
+
