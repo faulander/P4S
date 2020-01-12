@@ -91,6 +91,6 @@ class FilteredShowListView(SingleTableMixin, FilterView):
 
 class SettingsFormSetView(ModelFormSetView):
     model = Setting
-    fields = ['profile', 'addmonitored']
+    fields = ['profile', 'addmonitored', 'seasonfolders']
     template_name = 'settings.html'
     factory_kwargs = {'extra': 0}

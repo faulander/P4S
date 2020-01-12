@@ -268,7 +268,7 @@ def HelperUpdateShows():
     if r.status_code == 200:
         u = r.json()
         for i in range(len(u)):
-            updateSingleShow(str(i + 1))
+            # updateSingleShow(str(i + 1))
             try:
                 d1 = pendulum.from_timestamp(u[str(i + 1)])
                 d2 = pendulum.now()
