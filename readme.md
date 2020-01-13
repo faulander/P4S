@@ -31,6 +31,14 @@ Production:
 ToDo
 ```
 
+## Usage
+- Browse to http://localhost:8000/
+- Browse to settings
+- Choose at least the profile with which the shows should be added to sonarr
+- Browse to shows
+- Click the add button on any show you want added to Sonarr
+
+
 ## Release History
 
 * 0.1.0
