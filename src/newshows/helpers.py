@@ -36,7 +36,7 @@ def _requestURL(URL, METHOD="get"):
 
 def checkForActiveSonarr(SONARR_URL, SONARR_APIKEY):
     # both url and apikey are set
-    endpoint = "/system/status"
+    endpoint = "/system/status/"
     url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
     statuscode, sonarr = _requestURL(url)
     if sonarr and statuscode == 200:
@@ -283,7 +283,7 @@ def HelperUpdateShows():
 
 @db_periodic_task(crontab(minute='*/5'))
 def helperGetSonarrProfiles():
-    endpoint = "/profile"
+    endpoint = "/profile/"
     url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
     statuscode, sonarr = _requestURL(url)
     Profile.objects.all().delete()  # First delete all current profiles

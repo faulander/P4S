@@ -21,6 +21,10 @@ SONARR_ROOTFOLDER = ""
 
 if not SONARR_URL and not SONARR_APIKEY:
     sys.exit("Environment variables SONARR_URL or SONARR_APIKEY are not set.")
+else:
+    if not SONARR_URL.endswith("/api"):
+        SONARR_URL += "/api"
+        SONARR_URL.replace("//", "/")
 
 # Application definition
 INSTALLED_APPS = [
