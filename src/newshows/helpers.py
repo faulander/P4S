@@ -42,10 +42,13 @@ def getSonarrDownloads(SONARR_URL, SONARR_APIKEY):
     statuscode, sonarr = _requestURL(url)
     if statuscode == 200 and sonarr:
         logger.info("History from Sonarr fetched.")
-        for s in sonarr:
-            dictShow['episode'] = s['records']['sourceTitle']
-            dictShow['date'] = pendulum.parse(s['records']['date'])
-            lstDownloads.append(dictShow)
+        for s in sonarr['records']:
+            # logger.info(s)
+            dictShow['episode'] = s['sourceTitle']
+            dictShow['date'] = pendulum.parse(s['date'])
+            lstDownloads.append(dictShow.copy())
+            dictShow.clear()
+        logger.info(lstDownloads)
         return True, lstDownloads
     else:
         logger.error("History couldn't be fetched from Sonarr.")

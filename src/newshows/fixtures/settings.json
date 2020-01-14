@@ -3,7 +3,9 @@
     "model": "newshows.setting",
     "pk": 1,
     "fields": {
-      "page": 0
+      "page": 0,
+      "addmonitored": true,
+      "seasonfolders": true
     }
   }
 ]

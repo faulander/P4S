@@ -22,10 +22,11 @@ SONARR_ROOTFOLDER = ""
 if not SONARR_URL and not SONARR_APIKEY:
     sys.exit("Environment variables SONARR_URL or SONARR_APIKEY are not set.")
 else:
-    if not SONARR_URL.endswith("/api"):
-        SONARR_URL += "/api"
-        SONARR_URL.replace("//", "/")
-
+    if not SONARR_URL.endswith("/"):
+        SONARR_URL = SONARR_URL + "/api"
+    else:
+        SONARR_URL = SONARR_URL + "api"
+        
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
