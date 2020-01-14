@@ -92,7 +92,6 @@ def lastSonarrDownloads(request):
         raise Http404("History couldn't be loaded.")
 
 
-
 class FilteredShowListView(SingleTableMixin, FilterView):
     model = Show
     table_class = ShowTable
