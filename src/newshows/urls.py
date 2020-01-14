@@ -8,5 +8,5 @@ urlpatterns = [
     path("shows/", FilteredShowListView.as_view()),
     path("api/", views.AddShowToSonarr, name='addShowToSonarr'),
     path("settings/", SettingsFormSetView.as_view()),
-
+    path("downloads/", views.lastSonarrDownloads, name='lastSonarrDownloads'),
 ]
