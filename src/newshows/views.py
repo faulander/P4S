@@ -3,7 +3,10 @@ from django_tables2.views import SingleTableMixin
 from django.views.generic import UpdateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
+
+from django.shortcuts import render
+
 
 from .models import Show, Setting, Profile
 from .tables import ShowTable
@@ -13,6 +16,8 @@ import requests
 import logging
 import json
 from extra_views import ModelFormSetView
+
+from .helpers import getSonarrDownloads
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +83,13 @@ def AddShowToSonarr(request):
         logger.error("Lookup in Sonarr failed")
         data = {'status': 0, 'show': newshowdict['title']}
         return JsonResponse(data)
+
+def lastSonarrDownloads(request):
+    status, lastDownloads = getSonarrDownloads(settings.SONARR_URL, settings.SONARR_APIKEY)
+    if status:
+        return render(request, 'downloads.html', {"data": lastDownloads})
+    else:
+        raise Http404("History couldn't be loaded.")
 
 
 class FilteredShowListView(SingleTableMixin, FilterView):

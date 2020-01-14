@@ -34,6 +34,27 @@ def _requestURL(URL, METHOD="get"):
     return r.status_code, retValue
 
 
+def getSonarrDownloads(SONARR_URL, SONARR_APIKEY):
+    lstDownloads = list()
+    dictShow = dict()
+    endpoint = "/history/"
+    url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY + "&sortKey=date"
+    statuscode, sonarr = _requestURL(url)
+    if statuscode == 200 and sonarr:
+        logger.info("History from Sonarr fetched.")
+        for s in sonarr['records']:
+            # logger.info(s)
+            dictShow['episode'] = s['sourceTitle']
+            dictShow['date'] = pendulum.parse(s['date'])
+            lstDownloads.append(dictShow.copy())
+            dictShow.clear()
+        logger.info(lstDownloads)
+        return True, lstDownloads
+    else:
+        logger.error("History couldn't be fetched from Sonarr.")
+        return False
+
+
 def checkForActiveSonarr(SONARR_URL, SONARR_APIKEY):
     # both url and apikey are set
     endpoint = "/system/status/"
