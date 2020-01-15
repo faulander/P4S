@@ -8,22 +8,27 @@ P4S is a app that updates it's local database with the show information from TV 
 
 Development:
 
-```sh
 - clone or download the repository
 - create a virtual environment and activate it
-- install dependencies with pip install -r requirements.txt
-- run migrations with python manage.py migrate
-- install fixtures with python manage.py loaddata settings.json
+```python -m venv .venv```
+- install dependencies with 
+```pip install -r requirements.txt```
+- run migrations with 
+```python manage.py migrate```
+- install fixtures with 
+```python manage.py loaddata settings.json```
 - Set Environment variables:
-  - SONARR_URL=http://192.168.1.10:8989/ (example)
-  - SONARR_APIKEY=3jsehfu4853475hsdjf84 (example)
-
+Windows:
+```- set SONARR_URL=http://192.168.1.10:8989/ (example)
+  - set SONARR_APIKEY=3jsehfu4853475hsdjf84 (example)```
+Linux:
+```- export SONARR_URL="http://192.168.1.10:8989/" (example)
+- export SONARR_APIKEY=3jsehfu4853475hsdjf84```
 To Run Webserver only:
-- python manage.py runserver
+```python manage.py runserver```
 
 To Run Wevserver and background tasks
-- python manage.py run_huey & python manage.py runserver && fg
-```
+```python manage.py run_huey & python manage.py runserver && fg```
 
 
 Production:
