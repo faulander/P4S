@@ -20,22 +20,17 @@ Development:
 - Set Environment variables:
 Windows:
 ```- set SONARR_URL=http://192.168.1.10:8989/ (example)
-  - set SONARR_APIKEY=3jsehfu4853475hsdjf84 (example)```
+  - set SONARR_APIKEY=3jsehfu4853475hsdjf84 (example)
+  ```
 Linux:
 ```- export SONARR_URL="http://192.168.1.10:8989/" (example)
-- export SONARR_APIKEY=3jsehfu4853475hsdjf84```
+- export SONARR_APIKEY=3jsehfu4853475hsdjf84
+```
 To Run Webserver only:
 ```python manage.py runserver```
 
 To Run Wevserver and background tasks
 ```python manage.py run_huey & python manage.py runserver && fg```
-
-
-Production:
-
-```sh
-ToDo
-```
 
 ## Usage
 - Browse to http://localhost:8000/
