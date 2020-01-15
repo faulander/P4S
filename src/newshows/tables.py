@@ -16,7 +16,7 @@ class ShowTable(tables.Table):
     def render_name(self, value, record):
         returnstring = ""
         if record.tvmaze_id:
-            returnstring += "<a href='https://www.tvmaze.com/show/" + str(record.tvmaze_id) + "'><img src='/static/img/tvmaze.ico' height='20px'></a>" 
+            returnstring += "<a href='https://www.tvmaze.com/shows/" + str(record.tvmaze_id) + "'><img src='/static/img/tvmaze.ico' height='20px'></a>" 
         if record.imdb_id:
             returnstring += "<a href='https://www.imdb.com/title/" + record.imdb_id + "'><img src='/static/img/imdb.ico' height='20px'></a>" 
         if record.tvrage_id:
