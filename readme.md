@@ -13,6 +13,7 @@ Development:
 - create a virtual environment and activate it
 - install dependencies with pip install -r requirements.txt
 - run migrations with python manage.py migrate
+- install fixtures with python manage.py loaddata settings.json
 - Set Environment variables:
   - SONARR_URL=http://192.168.1.10:8989/ (example)
   - SONARR_APIKEY=3jsehfu4853475hsdjf84 (example)
