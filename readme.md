@@ -19,13 +19,18 @@ Development:
 ```python manage.py loaddata settings.json```
 - Set Environment variables:
 Windows:
-```- set SONARR_URL=http://192.168.1.10:8989/ (example)
-  - set SONARR_APIKEY=3jsehfu4853475hsdjf84 (example)
+```
+set SONARR_URL=http://192.168.1.10:8989/
+set SONARR_APIKEY=3jsehfu4853475hsdjf84
+(change to the real values)
   ```
 Linux:
-```- export SONARR_URL="http://192.168.1.10:8989/" (example)
-- export SONARR_APIKEY=3jsehfu4853475hsdjf84
 ```
+export SONARR_URL="http://192.168.1.10:8989/"
+export SONARR_APIKEY="3jsehfu4853475hsdjf84"
+(change to the real values)
+```
+
 To Run Webserver only:
 ```python manage.py runserver```
 
