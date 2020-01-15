@@ -18,6 +18,7 @@ Development:
 - install fixtures with 
 ```python manage.py loaddata settings.json```
 - Set Environment variables:
+
 Windows:
 ```
 set SONARR_URL=http://192.168.1.10:8989/
