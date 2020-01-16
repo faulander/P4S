@@ -38,7 +38,7 @@ def getSonarrDownloads(SONARR_URL, SONARR_APIKEY):
     lstDownloads = list()
     dictShow = dict()
     endpoint = "/history/"
-    url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY + "&sortKey=date"
+    url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
     statuscode, sonarr = _requestURL(url)
     if statuscode == 200 and sonarr:
         logger.info("History from Sonarr fetched.")
