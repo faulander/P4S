@@ -6,6 +6,11 @@ P4S is a app that updates it's local database with the show information from TV 
 
 ## Installation
 
+Production:
+- pull the image from docker:
+```docker pull faulander/p4s:latest```
+-
+
 Development:
 
 - clone or download the repository
