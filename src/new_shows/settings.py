@@ -26,7 +26,7 @@ else:
         SONARR_URL = SONARR_URL + "/api"
     else:
         SONARR_URL = SONARR_URL + "api"
-        
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
