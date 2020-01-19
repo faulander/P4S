@@ -59,23 +59,6 @@
             var thetvdb_id = $(this).val();
             var button_clicked = $(this)
            
-            $.ajax({
-                url: '{% url "addShowToSonarr" %}',
-                data: {
-                  'thetvdb_id': thetvdb_id
-                },
-                dataType: 'json',
-                success: function (data) {
-                  $(".addSonarr").attr("disabled", false);
-                  if (data.status) {
-                    $(button_clicked).closest("tr").hide();
-                    $.notify("Show " + data.show + " added to Sonnar.", "success");
-                    } else {
-                        $.notify("Show " + data.show + " not added to Sonnar.", "error");
-                    }
-                }
-              });
-        
-            });    
+                });
     </script>
 {% endblock %}

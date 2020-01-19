@@ -6,7 +6,6 @@ from .views import FilteredShowListView, SettingsFormSetView
 urlpatterns = [
     path('', FilteredShowListView.as_view()),
     path("shows/", FilteredShowListView.as_view()),
-    #path("api/", views.adShowToSonarr, name='addShowToSonarr'),
     path("settings/", SettingsFormSetView.as_view()),
     path("downloads/", views.lastSonarrDownloads, name='lastSonarrDownloads'),
 ]
