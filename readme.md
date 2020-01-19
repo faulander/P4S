@@ -8,44 +8,28 @@ P4S is a app that updates it's local database with the show information from TV 
 
 Development:
 
-- make sure that you have at least Python 3.6 installed
-
-```python -V```
+- make sure that you have at least Python 3.6 installed: ```python -V```
 - clone or download the repository
 - change into the downloaded directory
-- install pipenv
-
-```pip install pipenv```
-- install dependencies with 
-
-```pipenv install```
-- switch to source directory
-
-```cd src```
+- install pipenv: ```pip install pipenv```
+- install dependencies: ```pipenv install```
+- switch to source directory: ```cd src```
 - Set Environment variables:
   - rename .env example to .env
   - fill .env with correct values
     at least SONARR_API_HOST and SONARR_API_KEY need to be filled
 
-- run migrations with 
-
-```python manage.py migrate```
-- install fixtures with 
-
-```python manage.py loaddata settings.json```
+- run migrations: ```python manage.py migrate```
+- install fixtures: ```python manage.py loaddata settings.json```
 
 
-- Run the firstrun management command:
-```python manage.py firstrun```
-(This may run an hour, pulling 40k+ shows takes it's time.
-But you can open a new terminal window and start with fewer
-shows)
+- Run the firstrun management command: ```python manage.py firstrun```
+  (This may run an hour, pulling 40k+ shows takes it's time.
+  But you can open a new terminal window and start with fewer
+  shows)
 
-To Run Webserver only:
-```python manage.py runserver```
-
-To Run Wevserver and background tasks
-```python manage.py run_huey & python manage.py runserver && fg```
+To Run Webserver only: ```python manage.py runserver```
+To Run Wevserver and background tasks: ```python manage.py run_huey & python manage.py runserver && fg```
 
 ## Usage
 - Browse to http://localhost:8000/
@@ -57,9 +41,9 @@ To Run Wevserver and background tasks
 
 ## Release History
 
-* 0.1.1 (upcoming)
+* 0.1.1 (current)
     * Changes to application setup for docker environment
-* 0.1.0 (current)
+* 0.1.0 
     * The first proper release
 
 ## Meta
