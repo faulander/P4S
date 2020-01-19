@@ -8,11 +8,16 @@ P4S is a app that updates it's local database with the show information from TV 
 
 Development:
 
+- make sure that you have at least Python 3.6 installed
+```python -V```
 - clone or download the repository
-- create a virtual environment and activate it
-```python -m venv .venv```
+- change into the downloaded directory
+- install pipenv
+```pip install pipenv```
 - install dependencies with 
-```pip install -r requirements.txt```
+```pipenv install```
+- switch to source directory
+```cd src```
 - run migrations with 
 ```python manage.py migrate```
 - install fixtures with 
@@ -31,6 +36,8 @@ export SONARR_URL="http://192.168.1.10:8989/"
 export SONARR_APIKEY="3jsehfu4853475hsdjf84"
 (change to the real values)
 ```
+- Run the firstrun management command:
+```python manage.py firstrun```
 
 To Run Webserver only:
 ```python manage.py runserver```
@@ -48,7 +55,9 @@ To Run Wevserver and background tasks
 
 ## Release History
 
-* 0.1.0
+* 0.1.1 (upcoming)
+    * Changes to application setup for docker environment
+* 0.1.0 (current)
     * The first proper release
 
 ## Meta
