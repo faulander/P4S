@@ -22,26 +22,19 @@ Development:
 - switch to source directory
 
 ```cd src```
+- Set Environment variables:
+  - rename .env example to .env
+  - fill .env with correct values
+    at least SONARR_API_HOST and SONARR_API_KEY need to be filled
+
 - run migrations with 
 
 ```python manage.py migrate```
 - install fixtures with 
 
 ```python manage.py loaddata settings.json```
-- Set Environment variables:
 
-Windows:
-```
-set SONARR_URL=http://192.168.1.10:8989/
-set SONARR_APIKEY=3jsehfu4853475hsdjf84
-(change to the real values)
-  ```
-Linux:
-```
-export SONARR_URL="http://192.168.1.10:8989/"
-export SONARR_APIKEY="3jsehfu4853475hsdjf84"
-(change to the real values)
-```
+
 - Run the firstrun management command:
 ```python manage.py firstrun```
 (This may run an hour, pulling 40k+ shows takes it's time.
