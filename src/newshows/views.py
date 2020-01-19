@@ -21,7 +21,7 @@ from .helpers import getSonarrDownloads
 
 logger = logging.getLogger(__name__)
 
-def AddShowToSonarr(request):
+def addShowToSonarr(request):
     """
     Info from Sonarr:
     Required: tvdbId (int) title (string) profileId (int) titleSlug (string) images (array) seasons (array) - See GET output for format

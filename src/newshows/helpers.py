@@ -58,17 +58,13 @@ def getSonarrDownloads(SONARR_URL, SONARR_APIKEY):
 def checkForActiveSonarr(SONARR_URL, SONARR_APIKEY):
     # both url and apikey are set
     endpoint = "/system/status/"
-    url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
+    url = SONARR_URL + endpoint + "?apikey=" + SONARR_APIKEY
     statuscode, sonarr = _requestURL(url)
     if sonarr and statuscode == 200:
         logger.info("Connection to Sonarr established.")
-        settings.SONARR_OK = True
-        logger.info("SONARR_OK: {}".format(settings.SONARR_OK))
         return True
     else:
         logger.error("Connection to Sonarr failed.")
-        settings.SONARR_OK = False
-        logger.info("SONARR_OK: {}".format(settings.SONARR_OK))
         return False
 
 @db_periodic_task(crontab(minute='*/5'))
