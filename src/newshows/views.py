@@ -24,7 +24,8 @@ logger = logging.getLogger(__name__)
 def addShowToSonarr(request):
     """
     Info from Sonarr:
-    Required: tvdbId (int) title (string) profileId (int) titleSlug (string) images (array) seasons (array) - See GET output for format
+    Required: tvdbId (int) title (string) profileId (int) titleSlug (string) images (array) seasons (array)
+    See GET output for format
     """
     thetvdb_id = request.GET.get('thetvdb_id', None)
     logger.info("Trying {}".format(thetvdb_id))
