@@ -14,6 +14,7 @@ pendulum = "*"
 requests = "*"
 huey = "*"
 Django = "*"
+environs = "*"
 
 [requires]
 python_version = "3.6"
