@@ -4,20 +4,28 @@ import logging.config
 from django.contrib.messages import constants as messages
 from django.core.management.utils import get_random_secret_key
 from huey import SqliteHuey
+from environs import Env
 
+env = Env()
+env.read_env()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 # CONSTANTS
-DEBUG = os.getenv('DEBUG', 'True')
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(',')
-LOGLEVEL = os.getenv('LOGLEVEL', 'info').upper()
-SONARR_URL = os.getenv('SONARR_URL')
-SONARR_APIKEY = os.getenv('SONARR_APIKEY')
+DEBUG = env.bool('DEBUG', True)
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', '*')
+LOGLEVEL = env.log_level("LOG_LEVEL", "INFO")
+SONARR_URL = env('SONARR_URL')
+SONARR_APIKEY = env('SONARR_APIKEY')
 SECRET_KEY = get_random_secret_key()
 SONARR_OK = False
 SONARR_ROOTFOLDER = ""
+RAPIDAPI_HOST = env('RAPIDAPI_HOST')
+RAPIDAPI_KEY = env('RAPIDAPI_KEY')
+RAPIDAPI_COUNTRIES = env.list('RAPIDAPI_COUNTRIES')
+RAPIDAPI_HOSTS = env.list('RAPIDAPI_HOSTS')
+
 
 if not SONARR_URL and not SONARR_APIKEY:
     sys.exit("Environment variables SONARR_URL or SONARR_APIKEY are not set.")
