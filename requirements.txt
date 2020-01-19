@@ -1,8 +1,0 @@
-Django
-django-crispy-forms
-django-extra-views
-django-filter
-django-tables2
-pendulum
-requests
-huey
