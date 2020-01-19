@@ -113,8 +113,8 @@ def HelperUpdateTVMaze():
     every page contains 250 shows, leaving spaces if shows are deleted.
     the updateTvMaze function catches up from last run and gets the new shows.
     """
-    settings = Setting.objects.get(id=1)
-    page = int(settings.page)
+    s = Setting.objects.get(pk=1)
+    page = int(s.page)
     if not page:
         page = 0
     statuscode = 200
@@ -199,11 +199,9 @@ def HelperUpdateTVMaze():
             dbShow.save()
             lstGenres.clear()
         page += 1
-        settings.page = page
-        settings.save()
+        q = Show.objects.filter(Q(pk=1)).update(page=page)
     page -= 2
-    settings.page = page  # get back to last unfinished page
-    settings.save()
+    q = Show.objects.filter(Q(pk=1)).update(page=page)
 
 
 def updateSingleShow(tvmaze_id):

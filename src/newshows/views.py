@@ -48,7 +48,7 @@ def addShowToSonarr(request):
     r = requests.get(url)
     statuscode = r.status_code
     if statuscode == 200:  # Show has been found
-        s = Setting.objects.get(id=1)
+        s = Setting.objects.get(pk=1)
         r = r.json()
         newshowdict['tvdbId'] = int(thetvdb_id)
         newshowdict['title'] = r[0]['title']
