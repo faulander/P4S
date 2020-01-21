@@ -29,8 +29,8 @@ Development:
 (This may run an hour, pulling 40k+ shows takes it's time. But you can open a new terminal window and start with fewer
   shows)
 
-- To Run Webserver only: ```python manage.py runserver```
-- To Run Wevserver and background tasks: ```python manage.py run_huey & python manage.py runserver && fg```
+- To Run Webserver only: ```python manage.py runserver --insecure```
+- To Run Wevserver and background tasks: ```python manage.py run_huey & python manage.py runserver --insecure && fg```
 
 ## Usage
 - Browse to http://localhost:8000/
