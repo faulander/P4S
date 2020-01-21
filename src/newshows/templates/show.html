@@ -2,7 +2,6 @@
 {% load django_tables2 %}
 {% load crispy_forms_tags %}
 {% load static %}
-
 {% block content %}
 {% if filter %}
 {% for message in messages %}
@@ -45,7 +44,6 @@
         </div>
 
     <button type="submit" class="btn btn-primary">Filter</button>
-    <button type="reset" class="btn btn-secondary">Reset</button>
 
 </form>
 {% endif %}
