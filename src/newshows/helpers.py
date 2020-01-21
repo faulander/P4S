@@ -58,17 +58,13 @@ def getSonarrDownloads(SONARR_URL, SONARR_APIKEY):
 def checkForActiveSonarr(SONARR_URL, SONARR_APIKEY):
     # both url and apikey are set
     endpoint = "/system/status/"
-    url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
+    url = SONARR_URL + endpoint + "?apikey=" + SONARR_APIKEY
     statuscode, sonarr = _requestURL(url)
     if sonarr and statuscode == 200:
         logger.info("Connection to Sonarr established.")
-        settings.SONARR_OK = True
-        logger.info("SONARR_OK: {}".format(settings.SONARR_OK))
         return True
     else:
         logger.error("Connection to Sonarr failed.")
-        settings.SONARR_OK = False
-        logger.info("SONARR_OK: {}".format(settings.SONARR_OK))
         return False
 
 @db_periodic_task(crontab(minute='*/5'))
@@ -117,8 +113,8 @@ def HelperUpdateTVMaze():
     every page contains 250 shows, leaving spaces if shows are deleted.
     the updateTvMaze function catches up from last run and gets the new shows.
     """
-    settings = Setting.objects.get(id=1)
-    page = int(settings.page)
+    s = Setting.objects.get(pk=1)
+    page = int(s.page)
     if not page:
         page = 0
     statuscode = 200
@@ -203,11 +199,9 @@ def HelperUpdateTVMaze():
             dbShow.save()
             lstGenres.clear()
         page += 1
-        settings.page = page
-        settings.save()
+        q = Show.objects.filter(Q(pk=1)).update(page=page)
     page -= 2
-    settings.page = page  # get back to last unfinished page
-    settings.save()
+    q = Show.objects.filter(Q(pk=1)).update(page=page)
 
 
 def updateSingleShow(tvmaze_id):

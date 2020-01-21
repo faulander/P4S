@@ -21,10 +21,11 @@ from .helpers import getSonarrDownloads
 
 logger = logging.getLogger(__name__)
 
-def AddShowToSonarr(request):
+def addShowToSonarr(request):
     """
     Info from Sonarr:
-    Required: tvdbId (int) title (string) profileId (int) titleSlug (string) images (array) seasons (array) - See GET output for format
+    Required: tvdbId (int) title (string) profileId (int) titleSlug (string) images (array) seasons (array)
+    See GET output for format
     """
     thetvdb_id = request.GET.get('thetvdb_id', None)
     logger.info("Trying {}".format(thetvdb_id))
@@ -47,7 +48,7 @@ def AddShowToSonarr(request):
     r = requests.get(url)
     statuscode = r.status_code
     if statuscode == 200:  # Show has been found
-        s = Setting.objects.get(id=1)
+        s = Setting.objects.get(pk=1)
         r = r.json()
         newshowdict['tvdbId'] = int(thetvdb_id)
         newshowdict['title'] = r[0]['title']

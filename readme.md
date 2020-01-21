@@ -13,35 +13,24 @@ Production:
 
 Development:
 
+- make sure that you have at least Python 3.6 installed: ```python -V```
 - clone or download the repository
-- create a virtual environment and activate it
-```python -m venv .venv```
-- install dependencies with 
-```pip install -r requirements.txt```
-- run migrations with 
-```python manage.py migrate```
-- install fixtures with 
-```python manage.py loaddata settings.json```
+- change into the downloaded directory
+- install pipenv: ```pip install pipenv```
+- install dependencies: ```pipenv install```
+- switch to source directory: ```cd src```
 - Set Environment variables:
+  - rename .env example to .env
+  - fill .env with correct values (at least SONARR_API_HOST and SONARR_API_KEY need to be filled)
+- run migrations: ```python manage.py migrate```
+- install fixtures: ```python manage.py loaddata settings.json```
+- Run the firstrun management command: ```python manage.py firstrun```
 
-Windows:
-```
-set SONARR_URL=http://192.168.1.10:8989/
-set SONARR_APIKEY=3jsehfu4853475hsdjf84
-(change to the real values)
-  ```
-Linux:
-```
-export SONARR_URL="http://192.168.1.10:8989/"
-export SONARR_APIKEY="3jsehfu4853475hsdjf84"
-(change to the real values)
-```
+(This may run an hour, pulling 40k+ shows takes it's time. But you can open a new terminal window and start with fewer
+  shows)
 
-To Run Webserver only:
-```python manage.py runserver```
-
-To Run Wevserver and background tasks
-```python manage.py run_huey & python manage.py runserver && fg```
+- To Run Webserver only: ```python manage.py runserver```
+- To Run Wevserver and background tasks: ```python manage.py run_huey & python manage.py runserver && fg```
 
 ## Usage
 - Browse to http://localhost:8000/
@@ -53,7 +42,9 @@ To Run Wevserver and background tasks
 
 ## Release History
 
-* 0.1.0
+* 0.1.1 (current)
+    * Changes to application setup for docker environment
+* 0.1.0 
     * The first proper release
 
 ## Meta
