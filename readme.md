@@ -13,6 +13,7 @@ Development:
 - change into the downloaded directory
 - install pipenv: ```pip install pipenv```
 - install dependencies: ```pipenv install```
+- run pipenv shell: ```pipenv shell```
 - switch to source directory: ```cd src```
 - Set Environment variables:
   - rename .env example to .env
