@@ -1,0 +1,25 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "arogl",
+      "name": "arogl",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1115472?v=4",
+      "profile": "https://github.com/arogl",
+      "contributions": [
+        "test",
+        "doc"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "P4S",
+  "projectOwner": "faulander",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
