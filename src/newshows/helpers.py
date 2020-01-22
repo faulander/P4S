@@ -199,9 +199,13 @@ def HelperUpdateTVMaze():
             dbShow.save()
             lstGenres.clear()
         page += 1
-        q = Show.objects.filter(Q(pk=1)).update(page=page)
+        s = Setting.objects.get(pk=1)
+        s.page = page
+        s.save()
     page -= 2
-    q = Show.objects.filter(Q(pk=1)).update(page=page)
+    s = Setting.objects.get(pk=1)
+    s.page = page
+    s.save()
 
 
 def updateSingleShow(tvmaze_id):

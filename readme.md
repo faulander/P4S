@@ -27,8 +27,7 @@ Development:
 - install fixtures: ```python manage.py loaddata settings.json```
 - Run the firstrun management command: ```python manage.py firstrun```
 
-(This may run an hour, pulling 40k+ shows takes it's time. But you can open a new terminal window and start with fewer
-  shows)
+(This may run an hour, pulling 40k+ shows takes it's time. But you can open a new terminal window and start with fewer shows. It will continue to populate the db in the background)
 
 - To Run Webserver only: ```python manage.py runserver --insecure```
 - To Run Wevserver and background tasks: ```python manage.py run_huey & python manage.py runserver --insecure && fg```
