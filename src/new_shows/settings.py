@@ -13,17 +13,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # CONSTANTS
 DEBUG = env.bool('DEBUG', True)
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', '*')
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['*'])
 LOGLEVEL = env.log_level("LOG_LEVEL", "INFO")
 SONARR_URL = env('SONARR_URL')
 SONARR_APIKEY = env('SONARR_APIKEY')
 SECRET_KEY = get_random_secret_key()
+RAPIDAPI_HOST = env('RAPIDAPI_HOST', "")
+RAPIDAPI_KEY = env('RAPIDAPI_KEY', "")
+RAPIDAPI_COUNTRIES = env.list('RAPIDAPI_COUNTRIES', [])
+RAPIDAPI_HOSTS = env.list('RAPIDAPI_HOSTS', [])
 SONARR_OK = False
 SONARR_ROOTFOLDER = ""
-RAPIDAPI_HOST = env('RAPIDAPI_HOST')
-RAPIDAPI_KEY = env('RAPIDAPI_KEY')
-RAPIDAPI_COUNTRIES = env.list('RAPIDAPI_COUNTRIES')
-RAPIDAPI_HOSTS = env.list('RAPIDAPI_HOSTS')
 
 
 if not SONARR_URL and not SONARR_APIKEY:
