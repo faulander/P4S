@@ -5,16 +5,16 @@ python:
   - "3.7"
   - "3.8"
 
-  env:
+env:
   - DJANGO_VERSION=2.0.0
   - DJANGO_VERSION=3.0.0
 
-  install:
+install:
   - pip install -q Django==$DJANGO_VERSION
   - pip install coverage
   - pip install pipenv
   - pipenv install --dev
-# command to run tests
+
 script: coverage run manage.py test
 
 after_success: coverage report
