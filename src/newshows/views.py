@@ -86,10 +86,10 @@ def addShowToSonarr(request):
         return JsonResponse(data)
 
 def lastSonarrDownloads(request):
-    status, lastDownloads = getSonarrDownloads(settings.SONARR_URL, settings.SONARR_APIKEY)
-    if status:
+    try:
+        status, lastDownloads = getSonarrDownloads(settings.SONARR_URL, settings.SONARR_APIKEY)
         return render(request, 'downloads.html', {"data": lastDownloads})
-    else:
+    except:
         raise Http404("History couldn't be loaded.")
 
 
