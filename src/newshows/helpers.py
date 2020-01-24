@@ -203,9 +203,9 @@ def HelperUpdateTVMaze():
         s.page = page
         s.save()
     page -= 2
-    s = Setting.objects.get(pk=1)
-    s.page = page
-    s.save()
+    S = Setting.objects.get(pk=1)
+    S.page = page
+    S.save()
 
 
 def updateSingleShow(tvmaze_id):
