@@ -23,3 +23,4 @@ class StatusCodeTests(TestCase):
         response = self.client.get(reverse('settings'))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'settings.html')
+

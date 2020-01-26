@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  web:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.dev
+      command: gunicorn new_shows.wsgi:application --bind 0.0.0.0:8000
+      ports:
+        - 8000:8000
+      env_file:
+        - ./.env.dev
+      depends_on:
+volumes:
