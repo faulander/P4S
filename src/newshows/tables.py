@@ -28,13 +28,13 @@ class ShowTable(tables.Table):
                             " height='20px'></a>"
 
         if record.imdb_id:
-            returnstring += "<a href='https://www.tvmaze.com/shows/" + \
+            returnstring += "<a href='https://www.imdb.com/title/" + \
                             str(record.imdb_id) + \
                             "'><img src='/static/img/imdb.ico'" + \
                             " height='20px'></a>"
 
         if record.thetvdb_id:
-            returnstring += "<a href='https://www.tvmaze.com/shows/" + \
+            returnstring += "<a href='https://thetvdb.com/search?query=" + \
                             str(record.thetvdb_id) + \
                             "'><img src='/static/img/thetvdb.ico'" + \
                             " height='20px'></a>"
