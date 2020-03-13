@@ -13,3 +13,5 @@ class ShowFilter(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         super(ShowFilter, self).__init__(*args, **kwargs)
         self.filters['insonarr'].label = "Show added to Sonarr?"
+
+# checked for V 0.2.0

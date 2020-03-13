@@ -18,6 +18,7 @@ Django = "*"
 environs = "*"
 gunicorn = "*"
 psycopg2 = "*"
+whitenoise = "*"
 
 [requires]
 python_version = "3.6"

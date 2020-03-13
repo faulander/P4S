@@ -52,6 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -73,6 +74,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'newshows.context_processors.settings',
             ],
         },
     },
@@ -133,6 +135,7 @@ STATICFILE_FINDERS = [
 ]
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "newshows", "static"),)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib import messages
-# from dbsettings.models import AppSettings
+from django.core.cache import cache
 
 
 import requests
@@ -123,14 +123,49 @@ class Profile(models.Model):
         verbose_name_plural = "Profiles"
 
 
-class Setting(models.Model):
+class Setting(SingletonModel):
     page = models.IntegerField()
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True, default=None)
     addmonitored = models.BooleanField(default=True, verbose_name="Add shows as monitored to Sonnar")
     seasonfolders = models.BooleanField(default=True, verbose_name="Subfolders for seasons")
-
+    SONARR_URL = models.CharField(blank=True, verbose_name="Sonarr URL")
+    SONARR_APIKEY = models.CharField(blank=True, verbose_name="Sonarr API-Key")
+    SONARR_OK = models.BooleanField(default=False)
+    SONARR_ROOTFOLDER = models.CharField(blank=True, verbose_name="Sonarr Rootfolder")
     def __str__(self):
         return "Settings"
 
     class Meta:
         verbose_name_plural = "Settings"
+
+class SingletonModel(models.Model):
+    """
+    Abstract Class for a Singleton Model
+    It only allows one row in the db and the delete method is disabled.
+    To load the site settings use:
+    To load the site settings use:
+    
+    from .models import Settings
+    settings = Settings.load()
+    
+    """
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(SingletonModel, self).save(*args, **kwargs)
+        self.set_cache()
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    def set_cache(self):
+        cache.set(self.__class__.__name__, self)
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        if not created:
+            obj.set_cache()
+        return cache.get(cls.__name__)

@@ -1,3 +1,6 @@
+# disabled for 0.2.0
+# for 0.3.0
+"""
 import logging
 import requests
 
@@ -43,3 +46,4 @@ class Command(BaseCommand):
         response = requests.request("GET", url, headers=headers, params=querystring)
 
         print(response.text)
+"""

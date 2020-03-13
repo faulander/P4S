@@ -1,21 +1,20 @@
-from .models import Show, ShowType, Genre, Status, Language, Country, Network, Webchannel, Profile, Setting
-from django.utils.timezone import make_aware
-from django.db.models import Q
-from django.conf import settings
-
+# Batteries first
 import logging
 import json
 import datetime
-
+# Django second
+from django.utils.timezone import make_aware
+from django.db.models import Q
+from .models import Show, ShowType, Genre, Status, Language, Country, Network, Webchannel, Profile, Setting
+# 3rd party last
 import requests
 import pendulum
 from huey import crontab
 from huey.contrib.djhuey import db_periodic_task, db_task
 
-
 logger = logging.getLogger(__name__)
 
-
+# checked for V 0.2.0
 def _is_json(myjson):
     try:
         json_object = json.loads(myjson)
@@ -23,6 +22,7 @@ def _is_json(myjson):
         return False
     return True
 
+# checked for V 0.2.0
 def _requestURL(URL, METHOD="get"):
     logger.info("Trying {}".format(URL))
     if METHOD == "get":
@@ -33,14 +33,14 @@ def _requestURL(URL, METHOD="get"):
         return False, False
     return r.status_code, retValue
 
-
-def getSonarrDownloads(SONARR_URL, SONARR_APIKEY):
+# checked for V 0.2.0
+def getSonarrDownloads():
     lstDownloads = list()
     dictShow = dict()
     endpoint = "/history/"
     url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
     statuscode, sonarr = _requestURL(url)
-    if statuscode == 200 and sonarr:
+    if statuscode == 200: 
         logger.info("History from Sonarr fetched.")
         for s in sonarr['records']:
             # logger.info(s)
@@ -54,19 +54,24 @@ def getSonarrDownloads(SONARR_URL, SONARR_APIKEY):
         logger.error("History couldn't be fetched from Sonarr.")
         return False
 
-
-def checkForActiveSonarr(SONARR_URL, SONARR_APIKEY):
-    # both url and apikey are set
+# checked for 0.2.0
+@db_periodic_task(crontab(minute='*/5'))
+def checkForActiveSonarr():
+    """
+    checks if Sonarr is reachable and updates settings 
+    """
     endpoint = "/system/status/"
-    url = SONARR_URL + endpoint + "?apikey=" + SONARR_APIKEY
+    url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
     statuscode, sonarr = _requestURL(url)
-    if sonarr and statuscode == 200:
+    if statuscode == 200:
         logger.info("Connection to Sonarr established.")
-        return True
+        settings.SONARR_OK = True
     else:
         logger.error("Connection to Sonarr failed.")
-        return False
+        settings.SONARR_OK = False
+    settings.save()
 
+# checked for 0.2.0
 @db_periodic_task(crontab(minute='*/5'))
 def HelperUpdateSonarr():
     """
@@ -104,8 +109,13 @@ def HelperUpdateSonarr():
                 Q(imdb_id=s_imdb)
             ).update(insonarr=True)
 
-
-@db_task()
+# checked for 0.2.0
+# TODO: Refactor:
+# On every run it should only get one page of results
+# if the current page is empty, get the last one
+# thus it can be run all 5 minutes and doesn't put too much 
+# pressure on the side.
+# we also don't need a firstrun command, since the page will fill itself uo
 @db_periodic_task(crontab(hour='*/3'))
 def HelperUpdateTVMaze():
     """
@@ -113,8 +123,7 @@ def HelperUpdateTVMaze():
     every page contains 250 shows, leaving spaces if shows are deleted.
     the updateTvMaze function catches up from last run and gets the new shows.
     """
-    s = Setting.objects.get(pk=1)
-    page = int(s.page)
+    page = settings.page
     if not page:
         page = 0
     statuscode = 200
@@ -199,15 +208,14 @@ def HelperUpdateTVMaze():
             dbShow.save()
             lstGenres.clear()
         page += 1
-        s = Setting.objects.get(pk=1)
-        s.page = page
-        s.save()
+        
+        settings.page = page
+        settings.save()
     page -= 2
-    S = Setting.objects.get(pk=1)
-    S.page = page
-    S.save()
+    settings.page = page
+    settings.save()
 
-
+#checked for 0.2.0
 def updateSingleShow(tvmaze_id):
     lstGenres = list()
     url = "http://api.tvmaze.com/shows/" + str(tvmaze_id)
@@ -280,6 +288,7 @@ def updateSingleShow(tvmaze_id):
         dbShow.save()
         logger.info("Show '{}' updated.".format(show['name']))
 
+#checked for 0.2.0
 @db_periodic_task(crontab(hour='*/24'))
 def HelperUpdateShows():
     url = "http://api.tvmaze.com/updates/shows"
@@ -300,6 +309,9 @@ def HelperUpdateShows():
             except KeyError:
                 pass
 
+#checked for 0.2.0
+# Is it really necessary to check all 5 Minutes?
+# TODO: Only get new profiles, if settings page is opened
 @db_periodic_task(crontab(minute='*/5'))
 def helperGetSonarrProfiles():
     endpoint = "/profile/"

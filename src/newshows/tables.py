@@ -1,15 +1,15 @@
-# tutorial/tables.py
-import django_tables2 as tables
-from .models import Show, Setting
+import logging
+import logging
 from django.utils.html import format_html
 from django.conf import settings
 from django.contrib.staticfiles import finders
+from .models import Show, Setting
+import django_tables2 as tables
 
-import logging
 
 logger = logging.getLogger(__name__)
 
-
+#checked for 0.2.0
 class ShowTable(tables.Table):
     # Edit = tables.TemplateColumn('<input type="checkbox" value="{{ record.pk }}" />', verbose_name="Edit")
     premiere = tables.DateColumn(format="y-m-d")

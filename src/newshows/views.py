@@ -1,26 +1,25 @@
+
+import logging
+import json
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
 from django.views.generic import UpdateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
 from django.http import JsonResponse, Http404
-
 from django.shortcuts import render
-
-
 from .models import Show, Setting, Profile
 from .tables import ShowTable
 from .filters import ShowFilter
 
 import requests
-import logging
-import json
 from extra_views import ModelFormSetView
-
 from .helpers import getSonarrDownloads
 
 logger = logging.getLogger(__name__)
 
+
+# checked for 0.2.0
 def addShowToSonarr(request):
     """
     Info from Sonarr:
@@ -39,6 +38,7 @@ def addShowToSonarr(request):
             ret = r.json()
             settings.SONARR_ROOTFOLDER = ret[0]["path"]
             logger.info("Rootfolder set to {}".format(settings.SONARR_ROOTFOLDER))
+            settings.save()
         else:
             logger.error("Couldn't get rootfolder from Sonarr.")
             data = {'status': False}
@@ -48,7 +48,6 @@ def addShowToSonarr(request):
     r = requests.get(url)
     statuscode = r.status_code
     if statuscode == 200:  # Show has been found
-        s = Setting.objects.get(pk=1)
         r = r.json()
         newshowdict['tvdbId'] = int(thetvdb_id)
         newshowdict['title'] = r[0]['title']
@@ -85,14 +84,15 @@ def addShowToSonarr(request):
         data = {'status': 0, 'show': newshowdict['title']}
         return JsonResponse(data)
 
+# checked for 0.2.0
 def lastSonarrDownloads(request):
     try:
-        status, lastDownloads = getSonarrDownloads(settings.SONARR_URL, settings.SONARR_APIKEY)
+        status, lastDownloads = getSonarrDownloads()
         return render(request, 'downloads.html', {"data": lastDownloads})
     except:
         raise Http404("History couldn't be loaded.")
 
-
+# checked for 0.2.0
 class FilteredShowListView(SingleTableMixin, FilterView):
     model = Show
     table_class = ShowTable
@@ -101,9 +101,9 @@ class FilteredShowListView(SingleTableMixin, FilterView):
 
     filterset_class = ShowFilter
 
-
+# checked for 0.2.0
 class SettingsFormSetView(ModelFormSetView):
     model = Setting
-    fields = ['profile', 'addmonitored', 'seasonfolders']
+    fields = ['SONARR_URL', 'SONARR_APIKEY', 'profile', 'addmonitored', 'seasonfolders']
     template_name = 'settings.html'
     factory_kwargs = {'extra': 0}
