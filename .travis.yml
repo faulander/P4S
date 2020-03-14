@@ -17,6 +17,7 @@ install:
 
 script: 
   - cd src
+  - cp .env\ example\ copy .env
   - python manage.py migrate
   - python manage.py loaddata settings.json
   - python manage.py test
