@@ -8,6 +8,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
 from django.http import JsonResponse, Http404
 from django.shortcuts import render
+from django.views.generic.edit import UpdateView
+from django.urls import reverse
 from .models import Show, Setting, Profile
 from .tables import ShowTable
 from .filters import ShowFilter
@@ -26,6 +28,7 @@ def addShowToSonarr(request):
     Required: tvdbId (int) title (string) profileId (int) titleSlug (string) images (array) seasons (array)
     See GET output for format
     """
+    settings = Setting.load()
     thetvdb_id = request.GET.get('thetvdb_id', None)
     logger.info("Trying {}".format(thetvdb_id))
     newshowdict = dict()
@@ -102,8 +105,14 @@ class FilteredShowListView(SingleTableMixin, FilterView):
     filterset_class = ShowFilter
 
 # checked for 0.2.0
-class SettingsFormSetView(ModelFormSetView):
+class SettingsFormSetView(UpdateView):
     model = Setting
-    fields = ['SONARR_URL', 'SONARR_APIKEY', 'profile', 'addmonitored', 'seasonfolders']
+    exclude = ['page', 'SONARR_OK']
+
     template_name = 'settings.html'
-    factory_kwargs = {'extra': 0}
+
+    def get_object(self):
+        return Setting.objects.get(pk=1)
+
+    def get_success_url(self):
+        return reverse('settings')

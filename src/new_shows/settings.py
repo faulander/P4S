@@ -3,7 +3,6 @@ import sys
 import logging.config
 from django.contrib.messages import constants as messages
 from django.core.management.utils import get_random_secret_key
-from huey import SqliteHuey
 from environs import Env
 
 env = Env()
@@ -15,24 +14,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 DEBUG = env.bool('DEBUG', True)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['*'])
 LOGLEVEL = env.log_level("LOG_LEVEL", "INFO")
-SONARR_URL = env('SONARR_URL')
-SONARR_APIKEY = env('SONARR_APIKEY')
-SECRET_KEY = get_random_secret_key()
-RAPIDAPI_HOST = env('RAPIDAPI_HOST', "")
-RAPIDAPI_KEY = env('RAPIDAPI_KEY', "")
-RAPIDAPI_COUNTRIES = env.list('RAPIDAPI_COUNTRIES', [])
-RAPIDAPI_HOSTS = env.list('RAPIDAPI_HOSTS', [])
-SONARR_OK = False
-SONARR_ROOTFOLDER = ""
-
-
-if not SONARR_URL and not SONARR_APIKEY:
-    sys.exit("Environment variables SONARR_URL or SONARR_APIKEY are not set.")
-else:
-    if not SONARR_URL.endswith("/"):
-        SONARR_URL = SONARR_URL + "/api"
-    else:
-        SONARR_URL = SONARR_URL + "api"
+SECRET_KEY = env.str("SECRET_KEY", "wewqer$//§((83742387&&§_?/DFash")
 
 # Application definition
 INSTALLED_APPS = [
@@ -46,13 +28,12 @@ INSTALLED_APPS = [
     'django_filters',
     'extra_views',
     'crispy_forms',
-    'huey.contrib.djhuey',
     'newshows',
+    'background_task',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -74,7 +55,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'newshows.context_processors.settings',
             ],
         },
     },
@@ -84,12 +64,15 @@ WSGI_APPLICATION = 'new_shows.wsgi.application'
 
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    "default": {
+        "ENGINE": env("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": env("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
+        "USER": env("SQL_USER", "user"),
+        "PASSWORD": env("SQL_PASSWORD", "password"),
+        "HOST": env("SQL_HOST", "localhost"),
+        "PORT": env("SQL_PORT", "5432"),
     }
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -121,21 +104,11 @@ USE_L10N = True
 USE_TZ = False
 
 
-
-#  Production
-MEDIA_ROOT = os.path.join(BASE_DIR, 'assets')
-STATIC_ROOT = [os.path.join(BASE_DIR, 'staticfiles'),]
-
-#  Development
-STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
-STATICFILE_FINDERS = [
-    "django.contrib.staticfiles.finders.FileSystemFinder",
-    "django.contrib.staticfiles.finders.AppDirectoriesFinder"
-]
+MEDIA_ROOT = os.path.join(BASE_DIR, 'assets')
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "newshows", "static"),)
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+STATIC_ROOT = [os.path.join(BASE_DIR, 'staticfiles'),]
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -174,20 +147,3 @@ logging.config.dictConfig({
         },
     },
 })
-
-#  HUEY = SqliteHuey(filename='crontasks.db')
-
-HUEY = {
-    'huey_class': 'huey.SqliteHuey',  # Huey implementation to use.
-    'filename': 'crontasks.db',  # Use db name for huey.
-    'results': True,  # Store return values of tasks.
-    'store_none': False,  # If a task returns None, do not save to results.
-    'immediate': False,  # If DEBUG=True, run synchronously.
-    'consumer': {
-        'workers': 1,
-        'worker_type': 'thread',
-        'periodic': True,  # Enable crontab feature.
-        'check_worker_health': True,  # Enable worker health checks.
-        'health_check_interval': 1,  # Check worker health every second.
-    },
-}
