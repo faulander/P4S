@@ -152,6 +152,7 @@ class Setting(SingletonModel):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True, default=None)
     addmonitored = models.BooleanField(default=True, verbose_name="Add shows as monitored to Sonnar")
     seasonfolders = models.BooleanField(default=True, verbose_name="Subfolders for seasons")
+    last_tvmaze_full_update = models.DateField(default="1970-01-01")
     SONARR_URL = models.CharField(max_length=1000,blank=True, verbose_name="Sonarr URL")
     SONARR_APIKEY = models.CharField(max_length=40,blank=True, verbose_name="Sonarr API-Key")
     SONARR_OK = models.BooleanField(default=False)

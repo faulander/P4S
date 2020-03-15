@@ -3,6 +3,7 @@ import logging
 import json
 import datetime
 from datetime import timedelta
+import time
 # Django second
 from django.utils.timezone import make_aware
 from django.db.models import Q
@@ -91,7 +92,7 @@ def checkForActiveSonarr():
     site_settings.save()
 
 # checked for 0.2.0
-#@db_periodic_task(crontab(minute='*/5'))
+@db_periodic_task(crontab(minute='*/5'))
 def HelperUpdateSonarr():
     """
     Gets the complete list of shows in Sonarr API
@@ -214,8 +215,8 @@ def HelperUpdateTVMaze():
         )
         if created:
             logger.info("New show added: {}".format(show['name']))
-        else:
-            logger.warning("Show already in DB: {}".format(show['name']))
+        #else:
+        #    logger.warning("Show already in DB: {}".format(show['name']))
         for lstGenre in lstGenres:
             lstGenre.shows.add(dbShow)
         dbShow.save()
@@ -226,8 +227,9 @@ def HelperUpdateTVMaze():
 #checked for 0.2.0
 def updateSingleShow(tvmaze_id):
     lstGenres = list()
-    url = "http://api.tvmaze.com/shows/" + str(tvmaze_id)
-    r = requests.get(url)
+    tvmaze_url = "http://api.tvmaze.com/shows/" + str(tvmaze_id)
+    logger.debug(f"Trying {tvmaze_url}")
+    r = requests.get(tvmaze_url)
     if r.status_code == 200:
         show = r.json()
         if show['language'] is not None:
@@ -280,43 +282,43 @@ def updateSingleShow(tvmaze_id):
             premiere = make_aware(premiere_obj)  # make timestamp timezone aware
         else:
             premiere = None
-        dbShow = Show.objects.get_or_create(tvmaze_id=show['id'])
-        dbShow.url = show['url']
-        dbShow.name = show['name']
-        dbShow.type = dbType
-        dbShow.language = dbLanguage
-        dbShow.status = dbStatus
-        dbShow.runtime = runtime
-        dbShow.premiere = premiere
-        dbShow.network = dbNetwork
-        dbShow.webchannel = dbWebchannel
-        dbShow.tvrage_id = show['externals']['tvrage']
-        dbShow.thetvdb_id = show['externals']['thetvdb']
-        dbShow.imdb_id = show['externals']['imdb']
-        dbShow.save()
-        logger.info("Show '{}' updated.".format(show['name']))
+        dbShow, updated = Show.objects.update_or_create(
+            tvmaze_id=show['id'],
+            defaults={
+                'url':show['url'],
+                'name':show['name'],
+                'type':dbType,
+                'language':dbLanguage,
+                'status':dbStatus,
+                'runtime':runtime,
+                'premiere':premiere,
+                'network':dbNetwork,
+                'webchannel':dbWebchannel,
+                'tvrage_id':show['externals']['tvrage'],
+                'thetvdb_id':show['externals']['thetvdb'],
+                'imdb_id':show['externals']['imdb']})
+    time.sleep(1)            
 
 #checked for 0.2.0
-#@db_periodic_task(crontab(hour='*/3'))
+@db_periodic_task(crontab(hour='*/1'))
 def HelperUpdateShows():
     site_settings = Setting.load()
     url = "http://api.tvmaze.com/updates/shows"
-    r = requests.get(url)
-    if r.status_code == 200:
-        u = r.json()
-        for i in range(len(u)):
-            # updateSingleShow(str(i + 1))
-            try:
-                d1 = pendulum.from_timestamp(u[str(i + 1)])
-                d2 = pendulum.now()
-                delta = d2 - d1
-                if delta.days < 2:
-                    #  Show has been updated in the last 2 days
-                    # we are running the tvmaze update every 24 hours, so we are save
-                    # to get all updates
-                    updateSingleShow(str(i + 1))
-            except KeyError:
-                pass
+    db_last_update = pendulum.parse(str(site_settings.last_tvmaze_full_update), strict=False)
+    if pendulum.today() > db_last_update:
+        r = requests.get(url)
+        if r.status_code == 200:
+            u = r.json()
+            for i in range(len(u)):
+                # updateSingleShow(str(i + 1))
+                try:
+                    date_tvmaze_update = pendulum.from_timestamp(u[str(i + 1)])
+                    if date_tvmaze_update >= db_last_update:
+                        updateSingleShow(str(i + 1))
+                except KeyError:
+                    pass
+        site_settings.last_tvmaze_full_update = pendulum.now()
+        site_settings.save()
 
 #checked for 0.2.0
 # Is it really necessary to check all 5 Minutes?

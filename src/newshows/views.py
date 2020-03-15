@@ -28,25 +28,25 @@ def addShowToSonarr(request):
     Required: tvdbId (int) title (string) profileId (int) titleSlug (string) images (array) seasons (array)
     See GET output for format
     """
-    settings = Setting.load()
+    site_settings = Setting.load()
     thetvdb_id = request.GET.get('thetvdb_id', None)
     logger.info("Trying {}".format(thetvdb_id))
     newshowdict = dict()
-    if not settings.SONARR_ROOTFOLDER:
-        url = settings.SONARR_URL + "/rootfolder/?apikey=" + settings.SONARR_APIKEY
+    if not site_settings.SONARR_ROOTFOLDER:
+        url = site_settings.SONARR_URL + "/rootfolder/?apikey=" + site_settings.SONARR_APIKEY
         logger.info("Trying {}".format(url))
         r = requests.get(url)
         statuscode = r.status_code
         if statuscode == 200:  # Show has been found
             ret = r.json()
-            settings.SONARR_ROOTFOLDER = ret[0]["path"]
+            site_settings.SONARR_ROOTFOLDER = ret[0]["path"]
             logger.info("Rootfolder set to {}".format(settings.SONARR_ROOTFOLDER))
-            settings.save()
+            site_settings.save()
         else:
             logger.error("Couldn't get rootfolder from Sonarr.")
             data = {'status': False}
             return JsonResponse(data)
-    url = settings.SONARR_URL + "/series/lookup?term=tvdb:" + str(thetvdb_id) + "&apikey=" + settings.SONARR_APIKEY
+    url = site_settings.SONARR_URL + "/series/lookup?term=tvdb:" + str(thetvdb_id) + "&apikey=" + site_settings.SONARR_APIKEY
     logger.info("Trying {}".format(url))
     r = requests.get(url)
     statuscode = r.status_code
@@ -54,17 +54,17 @@ def addShowToSonarr(request):
         r = r.json()
         newshowdict['tvdbId'] = int(thetvdb_id)
         newshowdict['title'] = r[0]['title']
-        tmpP = Profile.objects.get(pk=int(s.profile_id))
+        tmpP = Profile.objects.get(pk=int(site_settings.profile_id))
         newshowdict['profileId'] = tmpP.profile_id
         newshowdict['titleSlug'] = r[0]['titleSlug']
         newshowdict['images'] = r[0]['images']
         newshowdict['seasons'] = r[0]['seasons']
-        newshowdict['rootFolderPath'] = settings.SONARR_ROOTFOLDER
-        newshowdict['monitored'] = bool(s.addmonitored)
-        newshowdict['seasonFolder'] = bool(s.seasonfolders)
+        newshowdict['rootFolderPath'] = site_settings.SONARR_ROOTFOLDER
+        newshowdict['monitored'] = bool(site_settings.addmonitored)
+        newshowdict['seasonFolder'] = bool(site_settings.seasonfolders)
         newshow = json.dumps(newshowdict)
         print(newshow)
-        url = settings.SONARR_URL + "/series?apikey=" + settings.SONARR_APIKEY
+        url = site_settings.SONARR_URL + "/series?apikey=" + site_settings.SONARR_APIKEY
         logger.info("Trying {}".format(url))
         r = requests.post(url, data=newshow)
         logger.info("Status: {}".format(r.status_code))
