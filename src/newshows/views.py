@@ -107,12 +107,14 @@ class FilteredShowListView(SingleTableMixin, FilterView):
 # checked for 0.2.0
 class SettingsFormSetView(UpdateView):
     model = Setting
-    exclude = ['page', 'SONARR_OK']
-
+    fields = ['SONARR_URL', 'SONARR_APIKEY', 'profile', 'addmonitored', 'seasonfolders']
     template_name = 'settings.html'
 
     def get_object(self):
         return Setting.objects.get(pk=1)
 
     def get_success_url(self):
-        return reverse('settings')
+        return reverse('shows')
+    
+    def form_invalid(self, form):
+        logger.error(form)

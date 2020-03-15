@@ -10,8 +10,12 @@ from .models import Show, ShowType, Genre, Status, Language, Country, Network, W
 # 3rd party last
 import requests
 import pendulum
-from loguru import logger
-from background_task import background
+from huey import crontab
+from huey.contrib.djhuey import db_periodic_task
+import coloredlogs
+
+logger = logging.getLogger(__name__)
+coloredlogs.install(level='INFO')
 
 # checked for V 0.2.0
 def _is_json(myjson):
@@ -22,26 +26,36 @@ def _is_json(myjson):
     return True
 
 # checked for V 0.2.0
-def _requestURL(URL, METHOD="get"):
+def _requestURL(URL):
+    site_settings = Setting.load()
+    logger.debug(f"Sonarr URL: {site_settings.SONARR_URL}")
+    logger.debug(f"Sonarr APIKEY: {site_settings.SONARR_APIKEY}")
     logger.info("Trying {}".format(URL))
-    try:
-        r = requests.get(URL)
-    except:
-        return False, False
-    try:
+    headers = {
+        "X-Api-Key": site_settings.SONARR_APIKEY
+        }
+    if site_settings.SONARR_URL and site_settings.SONARR_APIKEY:
+        try:
+            r = requests.get(URL, headers=headers)
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            logger.error(f"Connection to {URL} raised {e}")
+            return 404, False
         retValue = r.json()
-    except:
-        return False, False
-    return r.status_code, retValue
+        logger.debug(f"Statuscode: {r.status_code}")
+        # logger.info(retValue)
+        return r.status_code, retValue
+    else:
+        logger.error("SONARR_URL and/or SONARR_APIKEY not set")
+        return 404, False
 
 # checked for V 0.2.0
-@background(schedule=60)
+@db_periodic_task(crontab(minute='*/3'))
 def getSonarrDownloads():
-    settings = Setting.load()
+    site_settings = Setting.load()
     lstDownloads = list()
     dictShow = dict()
-    endpoint = "/history/"
-    url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
+    endpoint = "/history"
+    url = site_settings.SONARR_URL + endpoint # + "?apikey=" + settings.SONARR_APIKEY
     statuscode, sonarr = _requestURL(url)
     if statuscode == 200: 
         logger.info("History from Sonarr fetched.")
@@ -51,42 +65,42 @@ def getSonarrDownloads():
             dictShow['date'] = pendulum.parse(s['date'])
             lstDownloads.append(dictShow.copy())
             dictShow.clear()
-        logger.info(lstDownloads)
+        logger.debug(lstDownloads)
         return True, lstDownloads
     else:
         logger.error("History couldn't be fetched from Sonarr.")
         return False
 
 # checked for 0.2.0
-@background(schedule=60)
+@db_periodic_task(crontab(minute='*/1'))
 def checkForActiveSonarr():
     """
     checks if Sonarr is reachable and updates settings 
     """
-    settings = Setting.load()
-    endpoint = "/system/status/"
-    url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
+    site_settings = Setting.load()
+    endpoint = "/system/status"
+    url = site_settings.SONARR_URL + endpoint # + "?apikey=" + settings.SONARR_APIKEY
     statuscode, sonarr = _requestURL(url)
     if statuscode == 200:
         logger.info("Connection to Sonarr established.")
-        settings.SONARR_OK = True
+        site_settings.SONARR_OK = True
     else:
         logger.error("Connection to Sonarr failed.")
-        settings.SONARR_OK = False
-    logger.debug(f"Settings: {settings}")
-    settings.save()
+        site_settings.SONARR_OK = False
+    #logger.debug(f"Settings: {site_settings}")
+    site_settings.save()
 
 # checked for 0.2.0
-@background(schedule=300)
+#@db_periodic_task(crontab(minute='*/5'))
 def HelperUpdateSonarr():
     """
     Gets the complete list of shows in Sonarr API
     If a show is found, the column 'insonarr' is set to true
     """
-    settings = Setting.load()
-    if settings.SONARR_OK:
+    site_settings = Setting.load()
+    if site_settings.SONARR_OK:
         endpoint = "/series"
-        url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
+        url = site_settings.SONARR_URL + endpoint #+ "?apikey=" + settings.SONARR_APIKEY
         statuscode, sonarr = _requestURL(url)
         # logger.debug(sonarr)
         for s in sonarr:
@@ -115,22 +129,20 @@ def HelperUpdateSonarr():
             ).update(insonarr=True)
 
 # checked for 0.2.0
-@background(schedule=180)
+@db_periodic_task(crontab(minute='*/1'))
 def HelperUpdateTVMaze():
     """
     TVMazes update API provides tv shows in paged manner,
     every page contains 250 shows, leaving spaces if shows are deleted.
     the updateTvMaze function catches up from last run and gets the new shows.
     """
-    settings = Setting.load()
-    statuscode = 0
-    page = settings.page
-    if not page:
-        page = 0
-    while statuscode != 200:
-        url = "http://api.tvmaze.com/shows?page=" + str(page)
+    site_settings = Setting.load()
+    url = "http://api.tvmaze.com/shows?page=" + str(site_settings.page)
+    statuscode, shows = _requestURL(url)
+    if statuscode != 200:
+        site_settings.page -= 1
+        url = "http://api.tvmaze.com/shows?page=" + str(site_settings.page)
         statuscode, shows = _requestURL(url)
-        page -= 1
     lstGenres = list()
     for show in shows:
         if show['language'] is not None:
@@ -203,15 +215,13 @@ def HelperUpdateTVMaze():
         if created:
             logger.info("New show added: {}".format(show['name']))
         else:
-            logger.info("Show already in DB: {}".format(show['name']))
+            logger.warning("Show already in DB: {}".format(show['name']))
         for lstGenre in lstGenres:
             lstGenre.shows.add(dbShow)
         dbShow.save()
         lstGenres.clear()
-    page += 1
-    settings.page = page
-    logger.debug(f"Settings: {settings}")
-    settings.save()
+    site_settings.page += 1
+    site_settings.save()
 
 #checked for 0.2.0
 def updateSingleShow(tvmaze_id):
@@ -270,7 +280,7 @@ def updateSingleShow(tvmaze_id):
             premiere = make_aware(premiere_obj)  # make timestamp timezone aware
         else:
             premiere = None
-        dbShow = Show.objects.get(tvmaze_id=show['id'])
+        dbShow = Show.objects.get_or_create(tvmaze_id=show['id'])
         dbShow.url = show['url']
         dbShow.name = show['name']
         dbShow.type = dbType
@@ -287,9 +297,9 @@ def updateSingleShow(tvmaze_id):
         logger.info("Show '{}' updated.".format(show['name']))
 
 #checked for 0.2.0
-@background(schedule=10800)
+#@db_periodic_task(crontab(hour='*/3'))
 def HelperUpdateShows():
-    settings = Setting.load()
+    site_settings = Setting.load()
     url = "http://api.tvmaze.com/updates/shows"
     r = requests.get(url)
     if r.status_code == 200:
@@ -311,15 +321,13 @@ def HelperUpdateShows():
 #checked for 0.2.0
 # Is it really necessary to check all 5 Minutes?
 # TODO: Only get new profiles, if settings page is opened
-@background(schedule=360))
+db_periodic_task(crontab(minute='*/4'))
 def helperGetSonarrProfiles():
-    settings = Setting.load()
+    site_settings = Setting.load()
     endpoint = "/profile/"
-    url = settings.SONARR_URL + endpoint + "?apikey=" + settings.SONARR_APIKEY
+    url = site_settings.SONARR_URL + endpoint # + "?apikey=" + settings.SONARR_APIKEY
     statuscode, sonarr = _requestURL(url)
     if statuscode == 200:
-        Profile.objects.all().delete()  # First delete all current profiles
-        
         for s in sonarr:
             dbProfile, _ = Profile.objects.get_or_create(
                 profile=s['name'],

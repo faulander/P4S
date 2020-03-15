@@ -153,7 +153,7 @@ class Setting(SingletonModel):
     addmonitored = models.BooleanField(default=True, verbose_name="Add shows as monitored to Sonnar")
     seasonfolders = models.BooleanField(default=True, verbose_name="Subfolders for seasons")
     SONARR_URL = models.CharField(max_length=1000,blank=True, verbose_name="Sonarr URL")
-    SONARR_APIKEY = models.CharField(max_length=30,blank=True, verbose_name="Sonarr API-Key")
+    SONARR_APIKEY = models.CharField(max_length=40,blank=True, verbose_name="Sonarr API-Key")
     SONARR_OK = models.BooleanField(default=False)
     SONARR_ROOTFOLDER = models.CharField(max_length=1000,blank=True, verbose_name="Sonarr Rootfolder")
     def __str__(self):

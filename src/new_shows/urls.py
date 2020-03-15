@@ -6,7 +6,7 @@ import sys
 from django.conf import settings
 from newshows.models import Show, Setting
 from django.db import connection
-import logging
+import logging, coloredlogs
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.staticfiles import views
@@ -23,9 +23,14 @@ urlpatterns = [
 
 urlpatterns += staticfiles_urlpatterns()
 
-getSonarrDownloads(repeat=60, repeat_until=None)
-checkForActiveSonarr(repeat=60, repeat_until=None)
-HelperUpdateSonarr(repeat=300, repeat_until=None)
-HelperUpdateTVMaze(repeat=180, repeat_until=None)
-HelperUpdateShows(repeat=10800, repeat_until=None)
-helperGetSonarrProfiles(repeat=360, repeat_until=None)
+huey_logger = logging.getLogger("huey")
+if huey_logger.handlers:
+    logger.info(
+        f"Handlers of huey_logger (before removing huey default handler): {huey_logger.handlers}"
+    )
+    huey_logger.handlers.pop()
+    logger.info(
+        f"Handlers of huey_logger (after removing huey default handler): {huey_logger.handlers}"
+    )
+    huey_logger.info("This should not appear.")
+

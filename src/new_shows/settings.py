@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     'extra_views',
     'crispy_forms',
     'newshows',
-    'background_task',
+    'huey.contrib.djhuey',  # Add this to the list.
 ]
 
 MIDDLEWARE = [
@@ -101,14 +101,14 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False
+USE_TZ = True
 
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'assets')
 
 STATIC_URL = '/static/'
-STATIC_ROOT = [os.path.join(BASE_DIR, 'staticfiles'),]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -125,25 +125,19 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
-logging.config.dictConfig({
-    'version': 1,
 
-    'disable_existing_loggers': False,
-    'formatters': {
-        'console': {
-            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(message)s',
-        },
+
+HUEY = {
+    'huey_class': 'huey.SqliteHuey',  # Huey implementation to use.
+    'filename': 'crontasks.db',  # Use db name for huey.
+    'results': True,  # Store return values of tasks.
+    'store_none': False,  # If a task returns None, do not save to results.
+    'immediate': False,  # If DEBUG=True, run synchronously.
+    'consumer': {
+        'workers': 1,
+        'worker_type': 'thread',
+        'periodic': True,  # Enable crontab feature.
+        'check_worker_health': True,  # Enable worker health checks.
+        'health_check_interval': 1,  # Check worker health every second.
     },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'console',
-        },
-    },
-    'loggers': {
-        '': {
-            'level': LOGLEVEL,
-            'handlers': ['console', ],
-        },
-    },
-})
+}

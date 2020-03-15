@@ -20,6 +20,8 @@ psycopg2 = "*"
 whitenoise = "*"
 loguru = "*"
 django-background-tasks = "*"
+huey = "*"
+coloredlogs = "*"
 
 [requires]
 python_version = "3.6"
