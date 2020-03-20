@@ -13,10 +13,8 @@ import requests
 import pendulum
 from huey import crontab
 from huey.contrib.djhuey import db_periodic_task
-import coloredlogs
+from loguru import logger
 
-logger = logging.getLogger(__name__)
-coloredlogs.install(level='INFO')
 
 # checked for V 0.2.0
 def _is_json(myjson):
@@ -130,7 +128,7 @@ def HelperUpdateSonarr():
             ).update(insonarr=True)
 
 # checked for 0.2.0
-@db_periodic_task(crontab(minute='*/1'))
+@db_periodic_task(crontab(minute='*/5'))
 def HelperUpdateTVMaze():
     """
     TVMazes update API provides tv shows in paged manner,

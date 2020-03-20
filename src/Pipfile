@@ -21,7 +21,6 @@ whitenoise = "*"
 loguru = "*"
 django-background-tasks = "*"
 huey = "*"
-coloredlogs = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"

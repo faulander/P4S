@@ -2,6 +2,9 @@
 asgiref==3.2.5
 certifi==2019.11.28
 chardet==3.0.4
+colorama==0.4.3 ; sys_platform == 'win32'
+django-background-tasks==1.2.5
+django-compat==1.0.15
 django-crispy-forms==1.9.0
 django-extra-views==0.13.0
 django-filter==2.2.0
@@ -11,6 +14,7 @@ environs==7.3.0
 gunicorn==20.0.4
 huey==2.2.0
 idna==2.9
+loguru==0.4.1
 marshmallow==3.5.1
 pendulum==2.1.0
 psycopg2==2.8.4
@@ -23,3 +27,4 @@ six==1.14.0
 sqlparse==0.3.1
 urllib3==1.25.8
 whitenoise==5.0.1
+win32-setctime==1.0.1 ; sys_platform == 'win32'

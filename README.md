@@ -12,26 +12,23 @@ Master Branch: [![Build Status](https://travis-ci.org/faulander/P4S.svg?branch=m
 
 ## Installation
 
-Production:
-- not yet production ready
+Production/Docker:
+- Clone the repository: ```https://github.com/faulander/P4S.git```
+- change into src directory
+- run ```docker build -t p4s:latest .```
+- 
 
 Development:
 
-- make sure that you have at least Python 3.6 installed: ```python -V```
+- make sure that you have at least Python 3.7 installed: ```python -V```
 - clone or download the repository
 - change into the downloaded directory
 - install pipenv: ```pip install pipenv```
 - install dependencies: ```pipenv install```
 - run pipenv shell: ```pipenv shell```
 - switch to source directory: ```cd src```
-- Set Environment variables:
-  - rename .env example to .env
-  - fill .env with correct values (at least SONARR_API_HOST and SONARR_API_KEY need to be filled)
 - run migrations: ```python manage.py migrate```
 - install fixtures: ```python manage.py loaddata settings.json```
-- Run the firstrun management command: ```python manage.py firstrun```
-
-(This may run an hour, pulling 40k+ shows takes it's time. But you can open a new terminal window and start with fewer shows. It will continue to populate the db in the background)
 
 - To Run Webserver only: ```python manage.py runserver --insecure```
 - To Run Wevserver and background tasks: ```python manage.py run_huey & python manage.py runserver --insecure && fg```
@@ -45,7 +42,9 @@ Development:
 
 
 ## Release History
-
+* 0.2.0 (Development)
+    * Fixed problem with settings
+    * Made the system docker ready
 * 0.1.1 (current)
     * Changes to application setup for docker environment
 * 0.1.0 
