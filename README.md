@@ -15,23 +15,22 @@ Master Branch: [![Build Status](https://travis-ci.org/faulander/P4S.svg?branch=m
 Production/Docker:
 - Clone the repository: ```https://github.com/faulander/P4S.git```
 - change into src directory
-- run ```docker build -t p4s:latest .```
-- 
+- docker-compose up
 
 Development:
 
 - make sure that you have at least Python 3.7 installed: ```python -V```
 - clone or download the repository
 - change into the downloaded directory
-- install pipenv: ```pip install pipenv```
-- install dependencies: ```pipenv install```
-- run pipenv shell: ```pipenv shell```
+- install venv: ```python -m venv .venv```
+- activate virtual environment
+- run pip install: ```pip install -r requirements.txt```
 - switch to source directory: ```cd src```
 - run migrations: ```python manage.py migrate```
 - install fixtures: ```python manage.py loaddata settings.json```
 
 - To Run Webserver only: ```python manage.py runserver --insecure```
-- To Run Wevserver and background tasks: ```python manage.py run_huey & python manage.py runserver --insecure && fg```
+- To Run Wevserver and background tasks: ```start.sh```
 
 ## Usage
 - Browse to http://localhost:8000/
