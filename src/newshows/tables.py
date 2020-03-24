@@ -19,7 +19,7 @@ class ShowTable(tables.Table):
         fields = ("name", "network", "webchannel", "genre", "language", "status", "premiere", "insonarr")
 
     def render_name(self, value, record):
-    
+
         returnstring = ""
         if record.tvmaze_id:
             returnstring += "<a href='https://www.tvmaze.com/shows/" + \
@@ -40,7 +40,7 @@ class ShowTable(tables.Table):
                             " height='20px'></a>"
         returnstring = "<strong>" + value + "</strong><br />" + returnstring
         return format_html(returnstring)
-        
+
     def render_insonarr(self, value, record):
         if record.thetvdb_id and not value:
             returnstring = "<button class='btn btn-primary addSonarr' value='" + str(record.thetvdb_id) + \
