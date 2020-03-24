@@ -1,6 +1,7 @@
 import os
 import sys
 import logging
+from logging.config import dictConfig
 from django.contrib.messages import constants as messages
 from django.core.management.utils import get_random_secret_key
 from environs import Env
@@ -119,3 +120,52 @@ CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_BROKER_URL = 'redis://redis/0'
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'simple': {
+            'format' : '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+            },
+        },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'celery': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'celery.log',
+            'formatter': 'simple',
+            'maxBytes': 1024 * 1024 * 100,  # 100 mb
+        },
+        'error': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'error.log',
+            'formatter': 'simple',
+            'maxBytes': 1024 * 1024 * 100,  # 100 mb
+        },
+        'main': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'main.log',
+            'formatter': 'simple',
+            'maxBytes': 1024 * 1024 * 100,  # 100 mb
+        },
+    },
+    'loggers': {
+        'celery': {
+            'handlers': ['celery'],
+            'level': 'DEBUG',
+        },
+        'django': {
+            'handlers': ['error'],
+            'level': 'DEBUG'
+        },
+        'root': {
+            'handlers': ['console', 'main'],
+            'level': 'DEBUG'
+        },
+    }
+}
+
+dictConfig(LOGGING)
