@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib import messages
-# from dbsettings.models import AppSettings
+from django.core.cache import cache
 
 
 import requests
@@ -8,6 +8,33 @@ import logging
 import json
 
 logger = logging.getLogger(__name__)
+
+
+class SingletonModel(models.Model):
+    """
+    Abstract Class for a Singleton Model
+    It only allows one row in the db and the delete method is disabled.
+    To load the site settings use:
+    
+    from .models import Settings
+    settings = Settings.load()
+    
+    """
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(SingletonModel, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
 
 
 class ShowType(models.Model):
@@ -65,7 +92,9 @@ class Country(models.Model):
 class Network(models.Model):
     tvmaze_id = models.IntegerField()
     network = models.CharField(max_length=30)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=True, null=True)
+    country = models.ForeignKey(
+        Country, on_delete=models.CASCADE, blank=True, null=True
+    )
 
     def __str__(self):
         return self.network
@@ -77,7 +106,9 @@ class Network(models.Model):
 class Webchannel(models.Model):
     tvmaze_id = models.IntegerField()
     name = models.CharField(max_length=30)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=True, null=True)
+    country = models.ForeignKey(
+        Country, on_delete=models.CASCADE, blank=True, null=True
+    )
 
     def __str__(self):
         return self.name
@@ -91,13 +122,21 @@ class Show(models.Model):
     url = models.CharField(max_length=100, blank=True, null=True, default=None)
     name = models.CharField(max_length=30, verbose_name="Show")
     type = models.ForeignKey(ShowType, on_delete=models.CASCADE)
-    language = models.ForeignKey(Language, on_delete=models.CASCADE, blank=True, null=True, default=None)
+    language = models.ForeignKey(
+        Language, on_delete=models.CASCADE, blank=True, null=True, default=None
+    )
     genre = models.ManyToManyField("Genre", related_name="shows")
     status = models.ForeignKey(Status, on_delete=models.CASCADE)
     runtime = models.IntegerField(default=0)
-    premiere = models.DateTimeField(blank=True, null=True, default=None, verbose_name="premiered")
-    network = models.ForeignKey(Network, on_delete=models.CASCADE, blank=True, null=True, default=None)
-    webchannel = models.ForeignKey(Webchannel, on_delete=models.CASCADE, blank=True, null=True, default=None)
+    premiere = models.DateTimeField(
+        blank=True, null=True, default=None, verbose_name="premiered"
+    )
+    network = models.ForeignKey(
+        Network, on_delete=models.CASCADE, blank=True, null=True, default=None
+    )
+    webchannel = models.ForeignKey(
+        Webchannel, on_delete=models.CASCADE, blank=True, null=True, default=None
+    )
     tvrage_id = models.CharField(max_length=10, blank=True, null=True, default=None)
     thetvdb_id = models.CharField(max_length=10, blank=True, null=True, default=None)
     imdb_id = models.CharField(max_length=10, blank=True, null=True, default=None)
@@ -123,11 +162,34 @@ class Profile(models.Model):
         verbose_name_plural = "Profiles"
 
 
-class Setting(models.Model):
-    page = models.IntegerField()
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True, default=None)
-    addmonitored = models.BooleanField(default=True, verbose_name="Add shows as monitored to Sonnar")
-    seasonfolders = models.BooleanField(default=True, verbose_name="Subfolders for seasons")
+class Setting(SingletonModel):
+    page = models.IntegerField(default=0)
+    profile = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, blank=True, null=True, default=None
+    )
+    addmonitored = models.BooleanField(
+        default=True, verbose_name="Add shows as monitored to Sonnar"
+    )
+    seasonfolders = models.BooleanField(
+        default=True, verbose_name="Subfolders for seasons"
+    )
+    last_tvmaze_full_update = models.DateField(default="1970-01-01")
+    SONARR_URL = models.CharField(
+        max_length=1000,
+        blank=True,
+        verbose_name="Sonarr URL",
+        default="Please enter the full path to your SONARR API",
+    )
+    SONARR_APIKEY = models.CharField(
+        max_length=40,
+        blank=True,
+        verbose_name="Sonarr API-Key",
+        default="Please enter your Sonarr API-Key",
+    )
+    SONARR_OK = models.BooleanField(default=False)
+    SONARR_ROOTFOLDER = models.CharField(
+        max_length=1000, blank=True, verbose_name="Sonarr Rootfolder"
+    )
 
     def __str__(self):
         return "Settings"

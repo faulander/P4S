@@ -1,10 +1,13 @@
+# disabled for 0.2.0
+# for 0.3.0
+"""
 import logging
 import requests
 
 from django.core.management.base import BaseCommand, CommandError
 
 import new_shows.settings as settings
-from newshows.helpers import _is_json
+from newshows.tasks import _is_json
 
 logger = logging.getLogger(__name__)
 
@@ -43,3 +46,4 @@ class Command(BaseCommand):
         response = requests.request("GET", url, headers=headers, params=querystring)
 
         print(response.text)
+"""

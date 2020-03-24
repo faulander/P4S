@@ -1,10 +1,9 @@
 from django.test import SimpleTestCase, TestCase
 from django.http import HttpRequest
 from django.urls import reverse
-
 from . import views
 
-
+# checked for 0.2.0
 class StatusCodeTests(TestCase):
     
     def test_home_page_status_code(self):

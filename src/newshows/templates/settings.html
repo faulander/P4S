@@ -6,7 +6,7 @@
 {% block content %}
     <form method="post">
         {% csrf_token %}
-        {{ formset|crispy }}
+        {{ form.as_p }} 
         <button class="btn btn-success">Change</button>
     </form>
 {% endblock %}

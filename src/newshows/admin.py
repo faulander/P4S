@@ -9,3 +9,5 @@ admin.site.register(Language)
 admin.site.register(Country)
 admin.site.register(Network)
 admin.site.register(Setting)
+
+# checked for V 0.2.0
