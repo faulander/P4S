@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 from django.contrib.messages import constants as messages
 from django.core.management.utils import get_random_secret_key
 from environs import Env
@@ -10,7 +11,7 @@ env.read_env()
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # CONSTANTS
-DEBUG = env.bool("DEBUG", True)
+DEBUG = env.bool("DEBUG", False)
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", ["*"])
 LOGLEVEL = env.log_level("LOG_LEVEL", "INFO")
 SECRET_KEY = env.str("SECRET_KEY", "wewqer$//§((83742387&&§_?/DFash")
@@ -28,7 +29,8 @@ INSTALLED_APPS = [
     "extra_views",
     "crispy_forms",
     "newshows",
-    "huey.contrib.djhuey",  # Add this to the list.
+    "django_celery_beat",
+    "django_celery_results",
 ]
 
 MIDDLEWARE = [
@@ -111,18 +113,9 @@ MESSAGE_TAGS = {
     messages.ERROR: "alert-danger",
 }
 
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+#CELERY_BROKER_URL = 'redis://192.168.42.167:32768/0'
+CELERY_BROKER_URL = 'redis://redis/0'
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
-HUEY = {
-    "huey_class": "huey.SqliteHuey",  # Huey implementation to use.
-    "filename": "crontasks.db",  # Use db name for huey.
-    "results": True,  # Store return values of tasks.
-    "store_none": False,  # If a task returns None, do not save to results.
-    "immediate": False,  # If DEBUG=True, run synchronously.
-    "consumer": {
-        "workers": 1,
-        "worker_type": "thread",
-        "periodic": True,  # Enable crontab feature.
-        "check_worker_health": True,  # Enable worker health checks.
-        "health_check_interval": 1,  # Check worker health every second.
-    },
-}

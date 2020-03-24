@@ -7,7 +7,7 @@ import requests
 from django.core.management.base import BaseCommand, CommandError
 
 import new_shows.settings as settings
-from newshows.helpers import _is_json
+from newshows.tasks import _is_json
 
 logger = logging.getLogger(__name__)
 

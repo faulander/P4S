@@ -16,7 +16,7 @@ from .filters import ShowFilter
 
 import requests
 from extra_views import ModelFormSetView
-from .helpers import getSonarrDownloads
+from .tasks import getSonarrDownloads
 
 logger = logging.getLogger(__name__)
 

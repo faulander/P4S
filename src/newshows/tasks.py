@@ -11,9 +11,17 @@ from .models import Show, ShowType, Genre, Status, Language, Country, Network, W
 # 3rd party last
 import requests
 import pendulum
-from huey import crontab
-from huey.contrib.djhuey import db_periodic_task
 from loguru import logger
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
+from celery import shared_task
+
+
+
+def ChangeSchedulingToOneDay():
+    schedule = IntervalSchedule.objects.get(every=1,period=IntervalSchedule.DAYS)
+    task = PeriodicTask.objects.get(name='Get the list of TV Shows from TV Maze')
+    task.interval = schedule
+    task.save()
 
 
 # checked for V 0.2.0
@@ -27,9 +35,9 @@ def _is_json(myjson):
 # checked for V 0.2.0
 def _requestURL(URL):
     site_settings = Setting.load()
-    logger.debug(f"Sonarr URL: {site_settings.SONARR_URL}")
-    logger.debug(f"Sonarr APIKEY: {site_settings.SONARR_APIKEY}")
-    logger.info("Trying {}".format(URL))
+    # logger.debug(f"Sonarr URL: {site_settings.SONARR_URL}")
+    # logger.debug(f"Sonarr APIKEY: {site_settings.SONARR_APIKEY}")
+    logger.debug("Trying {}".format(URL))
     headers = {
         "X-Api-Key": site_settings.SONARR_APIKEY
         }
@@ -48,7 +56,7 @@ def _requestURL(URL):
         return 404, False
 
 # checked for V 0.2.0
-@db_periodic_task(crontab(minute='*/3'))
+@shared_task()
 def getSonarrDownloads():
     site_settings = Setting.load()
     lstDownloads = list()
@@ -64,14 +72,14 @@ def getSonarrDownloads():
             dictShow['date'] = pendulum.parse(s['date'])
             lstDownloads.append(dictShow.copy())
             dictShow.clear()
-        logger.debug(lstDownloads)
+        # logger.debug(lstDownloads)
         return True, lstDownloads
     else:
         logger.error("History couldn't be fetched from Sonarr.")
         return False
 
 # checked for 0.2.0
-@db_periodic_task(crontab(minute='*/1'))
+@shared_task()
 def checkForActiveSonarr():
     """
     checks if Sonarr is reachable and updates settings 
@@ -90,7 +98,7 @@ def checkForActiveSonarr():
     site_settings.save()
 
 # checked for 0.2.0
-@db_periodic_task(crontab(minute='*/5'))
+@shared_task()
 def HelperUpdateSonarr():
     """
     Gets the complete list of shows in Sonarr API
@@ -128,7 +136,7 @@ def HelperUpdateSonarr():
             ).update(insonarr=True)
 
 # checked for 0.2.0
-@db_periodic_task(crontab(minute='*/5'))
+@shared_task()
 def HelperUpdateTVMaze():
     """
     TVMazes update API provides tv shows in paged manner,
@@ -139,6 +147,7 @@ def HelperUpdateTVMaze():
     url = "http://api.tvmaze.com/shows?page=" + str(site_settings.page)
     statuscode, shows = _requestURL(url)
     if statuscode != 200:
+        ChangeSchedulingToOneDay()
         site_settings.page -= 1
         url = "http://api.tvmaze.com/shows?page=" + str(site_settings.page)
         statuscode, shows = _requestURL(url)
@@ -298,7 +307,7 @@ def updateSingleShow(tvmaze_id):
     time.sleep(1)            
 
 #checked for 0.2.0
-@db_periodic_task(crontab(hour='*/1'))
+@shared_task
 def HelperUpdateShows():
     site_settings = Setting.load()
     url = "http://api.tvmaze.com/updates/shows"
@@ -320,8 +329,8 @@ def HelperUpdateShows():
 
 #checked for 0.2.0
 # Is it really necessary to check all 5 Minutes?
-# TODO: Only get new profiles, if settings page is opened
-db_periodic_task(crontab(minute='*/4'))
+# TODO: V0.3.0: Only get new profiles, if settings page is opened
+@shared_task()
 def helperGetSonarrProfiles():
     site_settings = Setting.load()
     endpoint = "/profile/"

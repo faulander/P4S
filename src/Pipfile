@@ -19,8 +19,10 @@ gunicorn = "*"
 psycopg2 = "*"
 whitenoise = "*"
 loguru = "*"
-django-background-tasks = "*"
-huey = "*"
+celery = "*"
+django-celery-results = "*"
+django-celery-beat = "*"
+redis = "*"
 
 [requires]
 python_version = "3.7"
