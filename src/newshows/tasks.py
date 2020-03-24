@@ -11,10 +11,10 @@ from .models import Show, ShowType, Genre, Status, Language, Country, Network, W
 # 3rd party last
 import requests
 import pendulum
-from loguru import logger
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from celery import shared_task
 
+logger = logging.getLogger(__name__)
 
 
 def ChangeSchedulingToOneDay():
