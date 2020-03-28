@@ -24,8 +24,8 @@ Development:
 - change into the downloaded directory
 - install venv: ```python -m venv .venv```
 - activate virtual environment
-- run pip install: ```pip install -r requirements.txt```
 - switch to source directory: ```cd src```
+- run pip install: ```pip install -r requirements.txt```
 - run migrations: ```python manage.py migrate```
 - install fixtures: ```python manage.py loaddata settings.json```
 
