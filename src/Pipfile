@@ -23,6 +23,7 @@ celery = "*"
 django-celery-results = "*"
 django-celery-beat = "*"
 redis = "*"
+bs4 = "*"
 
 [requires]
 python_version = "3.7"

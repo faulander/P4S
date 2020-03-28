@@ -117,9 +117,27 @@ class Webchannel(models.Model):
         verbose_name_plural = "Webchannels"
 
 
+class Review(models.Model):
+    title = models.CharField(max_length=255, blank=True)
+    description = models.CharField(max_length=255, blank=True)
+    link = models.CharField(max_length=255, blank=True)
+    pic = models.CharField(max_length=255, blank=True)
+    date = models.DateField()
+    author = models.CharField(max_length=255, blank=True)
+    source = models.CharField(max_length=255, blank=True)
+    score1 = models.IntegerField(default=0)
+    score2 = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = "Reviews"
+
+
 class Show(models.Model):
     tvmaze_id = models.IntegerField()
-    url = models.CharField(max_length=100, blank=True, null=True, default=None)
+    url = models.CharField(max_length=100, blank=True, default=None)
     name = models.CharField(max_length=30, verbose_name="Show")
     type = models.ForeignKey(ShowType, on_delete=models.CASCADE)
     language = models.ForeignKey(
