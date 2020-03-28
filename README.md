@@ -27,7 +27,6 @@ Development:
 - run pip install: ```pip install -r requirements.txt```
 - switch to source directory: ```cd src```
 - run migrations: ```python manage.py migrate```
-- install fixtures: ```python manage.py loaddata settings.json```
 
 - To Run Webserver only: ```python manage.py runserver --insecure```
 - To Run Wevserver and background tasks: ```start.sh```

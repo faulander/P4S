@@ -4,8 +4,9 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 from newshows.models import Setting
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
+from django.core.management import call_command
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("p4s")
 
 class Command(BaseCommand):
     help = 'Setup of cronjobs for P4S'
@@ -14,6 +15,7 @@ class Command(BaseCommand):
             pk=1,
             defaults={
                 "page": 0,
+                "firstrun": True,
             }
         )
         if created:
@@ -25,7 +27,7 @@ class Command(BaseCommand):
                 "interval":schedule,
                 "task":"newshows.tasks.checkForActiveSonarr",
             }
-        )
+       )
         task, created = PeriodicTask.objects.get_or_create(
             name='Get the list of TV Shows from TV Maze',
             defaults={
@@ -65,4 +67,9 @@ class Command(BaseCommand):
                 "task":"newshows.tasks.HelperUpdateShows",
             }
         )
- 
+        # Load show data into database if present
+    site_settings = Setting.load()
+    if site_settings.firstrun:
+        call_command('loaddata', 'shows.json', app_label='newshows')
+        site_settings.firstrun = False
+        site_settings.save()

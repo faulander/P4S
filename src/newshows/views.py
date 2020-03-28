@@ -18,7 +18,7 @@ import requests
 from extra_views import ModelFormSetView
 from .tasks import getSonarrDownloads
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("p4s")
 
 
 # checked for 0.2.0

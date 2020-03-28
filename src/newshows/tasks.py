@@ -3,6 +3,7 @@ import logging
 import json
 import datetime
 from datetime import timedelta
+from time import sleep
 import time
 # Django second
 from django.utils.timezone import make_aware
@@ -14,7 +15,7 @@ import pendulum
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from celery import shared_task
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('p4s')
 
 
 def ChangeSchedulingToOneDay():
@@ -236,7 +237,13 @@ def updateSingleShow(tvmaze_id):
     lstGenres = list()
     tvmaze_url = "http://api.tvmaze.com/shows/" + str(tvmaze_id)
     logger.debug(f"Trying {tvmaze_url}")
-    r = requests.get(tvmaze_url)
+    while True:
+        try:
+            r = requests.get(tvmaze_url)
+            if r.status_code == 200:
+                break
+        except requests.exceptions.ConnectionError:
+            logger.error(f"Update of show {tvmaze_id} failed.")
     if r.status_code == 200:
         show = r.json()
         if show['language'] is not None:
@@ -304,6 +311,7 @@ def updateSingleShow(tvmaze_id):
                 'tvrage_id':show['externals']['tvrage'],
                 'thetvdb_id':show['externals']['thetvdb'],
                 'imdb_id':show['externals']['imdb']})
+        logger.info(f"Show {show['name']} updated.")
     time.sleep(1)            
 
 #checked for 0.2.0

@@ -190,6 +190,7 @@ class Setting(SingletonModel):
     SONARR_ROOTFOLDER = models.CharField(
         max_length=1000, blank=True, verbose_name="Sonarr Rootfolder"
     )
+    FIRSTRUN = models.BooleanField()
 
     def __str__(self):
         return "Settings"
