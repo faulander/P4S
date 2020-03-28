@@ -7,8 +7,8 @@
 
 P4S is a app that updates it's local database with the show information from TV Maze. You can then search for shows and conveniently adding them to Sonarr. The difference between Sonarr's own search is, that you can filter by language, premiere date, etc.
 
-## Build Status
-Master Branch: [![Build Status](https://travis-ci.org/faulander/P4S.svg?branch=master)](https://travis-ci.org/faulander/P4S)
+## CI
+![Django CI](https://github.com/faulander/P4S/workflows/Django%20CI/badge.svg?branch=master)
 
 ## Installation
 
