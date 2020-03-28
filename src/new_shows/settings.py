@@ -125,7 +125,7 @@ LOGGING = {
     'disable_existing_loggers': True,
     'formatters': {
         'simple': {
-            'format' : '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+            'format' : '%(asctime)s - %(levelname)s - %(name)s - %(module)s/%(funcName)s - %(message)s'
             },
         },
     'handlers': {
@@ -155,15 +155,19 @@ LOGGING = {
     'loggers': {
         'celery': {
             'handlers': ['celery'],
-            'level': 'DEBUG',
+            'level': 'ERROR',
         },
         'django': {
             'handlers': ['error'],
-            'level': 'DEBUG'
+            'level': 'ERROR'
         },
         'root': {
             'handlers': ['console', 'main'],
-            'level': 'DEBUG'
+            'level': LOGLEVEL
+        },
+        'p4s': {
+            'handlers': ['console', 'main'],
+            'level': LOGLEVEL
         },
     }
 }
