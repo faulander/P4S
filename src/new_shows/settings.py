@@ -19,6 +19,7 @@ SECRET_KEY = env.str("SECRET_KEY", "wewqer$//§((83742387&&§_?/DFash")
 
 # Application definition
 INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -30,12 +31,11 @@ INSTALLED_APPS = [
     "extra_views",
     "crispy_forms",
     "newshows",
-    "django_celery_beat",
-    "django_celery_results",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -100,7 +100,7 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "assets")
 
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
@@ -114,58 +114,31 @@ MESSAGE_TAGS = {
     messages.ERROR: "alert-danger",
 }
 
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_CACHE_BACKEND = 'django-cache'
-#CELERY_BROKER_URL = 'redis://192.168.42.167:32768/0'
-CELERY_BROKER_URL = 'redis://redis/0'
-CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
-
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': True,
-    'formatters': {
-        'simple': {
-            'format' : '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-            },
+    "version": 1,
+    "disable_existing_loggers": True,
+    "formatters": {
+        "simple": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "simple"},
+        "error": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "error.log",
+            "formatter": "simple",
+            "maxBytes": 1024 * 1024 * 100,  # 100 mb
         },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-        'celery': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'celery.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
-        },
-        'error': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'error.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
-        },
-        'main': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'main.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
+        "main": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "main.log",
+            "formatter": "simple",
+            "maxBytes": 1024 * 1024 * 100,  # 100 mb
         },
     },
-    'loggers': {
-        'celery': {
-            'handlers': ['celery'],
-            'level': 'DEBUG',
-        },
-        'django': {
-            'handlers': ['error'],
-            'level': 'DEBUG'
-        },
-        'root': {
-            'handlers': ['console', 'main'],
-            'level': 'DEBUG'
-        },
-    }
+    "loggers": {
+        "django": {"handlers": ["error"], "level": "DEBUG"},
+        "root": {"handlers": ["console", "main"], "level": "DEBUG"},
+    },
 }
 
 dictConfig(LOGGING)

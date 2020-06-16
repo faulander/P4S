@@ -27,9 +27,8 @@ Development:
 - run pip install: ```pip install -r requirements.txt```
 - switch to source directory: ```cd src```
 - run migrations: ```python manage.py migrate```
-- install fixtures: ```python manage.py loaddata settings.json```
-
-- To Run Webserver only: ```python manage.py runserver --insecure```
+- run collectstatic: ```python manage.py collectstatic```
+- To Run Webserver only: ```python manage.py runserver```
 - To Run Wevserver and background tasks: ```start.sh```
 
 ## Usage
@@ -41,9 +40,10 @@ Development:
 
 
 ## Release History
-* 0.2.0 (Development)
-    * Fixed problem with settings
-    * Made the system docker ready
+* 0.3.0 (Development)
+    * Docker ready
+    * Switched to Whitenoise for staticfile serving
+    * Switched to DjangoQ for background tasks
 * 0.1.1 (current)
     * Changes to application setup for docker environment
 * 0.1.0 
