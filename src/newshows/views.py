@@ -13,12 +13,13 @@ from django.urls import reverse
 from .models import Show, Setting, Profile
 from .tables import ShowTable
 from .filters import ShowFilter
+from .tasks import _requestURL
 
 import requests
 from extra_views import ModelFormSetView
 from .tasks import getSonarrDownloads
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("p4s")
 
 
 # checked for 0.2.0
@@ -30,15 +31,13 @@ def addShowToSonarr(request):
     """
     site_settings = Setting.load()
     thetvdb_id = request.GET.get('thetvdb_id', None)
-    logger.info("Trying {}".format(thetvdb_id))
+    #logger.info("Trying {}".format(thetvdb_id))
     newshowdict = dict()
-    if not site_settings.SONARR_ROOTFOLDER:
+    if site_settings.SONARR_ROOTFOLDER == "":
         url = site_settings.SONARR_URL + "/rootfolder/?apikey=" + site_settings.SONARR_APIKEY
-        logger.info("Trying {}".format(url))
-        r = requests.get(url)
-        statuscode = r.status_code
-        if statuscode == 200:  # Show has been found
-            ret = r.json()
+        statuscode, ret = _requestURL(url)
+        logger.debug(ret[0]["path"])
+        if statuscode == 200:  # Rootfolder has been found
             site_settings.SONARR_ROOTFOLDER = ret[0]["path"]
             logger.info("Rootfolder set to {}".format(settings.SONARR_ROOTFOLDER))
             site_settings.save()
@@ -47,11 +46,8 @@ def addShowToSonarr(request):
             data = {'status': False}
             return JsonResponse(data)
     url = site_settings.SONARR_URL + "/series/lookup?term=tvdb:" + str(thetvdb_id) + "&apikey=" + site_settings.SONARR_APIKEY
-    logger.info("Trying {}".format(url))
-    r = requests.get(url)
-    statuscode = r.status_code
+    statuscode, r = _requestURL(url)
     if statuscode == 200:  # Show has been found
-        r = r.json()
         newshowdict['tvdbId'] = int(thetvdb_id)
         newshowdict['title'] = r[0]['title']
         tmpP = Profile.objects.get(pk=int(site_settings.profile_id))
@@ -63,7 +59,6 @@ def addShowToSonarr(request):
         newshowdict['monitored'] = bool(site_settings.addmonitored)
         newshowdict['seasonFolder'] = bool(site_settings.seasonfolders)
         newshow = json.dumps(newshowdict)
-        print(newshow)
         url = site_settings.SONARR_URL + "/series?apikey=" + site_settings.SONARR_APIKEY
         logger.info("Trying {}".format(url))
         r = requests.post(url, data=newshow)

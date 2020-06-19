@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "extra_views",
     "crispy_forms",
     "newshows",
+    "django_q",
 ]
 
 MIDDLEWARE = [
@@ -64,13 +65,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "new_shows.wsgi.application"
 
-
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'P4S',
+        'USER': 'admin',
+        'PASSWORD': 'Busc0pan1',
+        'HOST': '192.168.42.167',
+        'PORT': '32769',
     }
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -114,31 +119,63 @@ MESSAGE_TAGS = {
     messages.ERROR: "alert-danger",
 }
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": True,
-    "formatters": {
-        "simple": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
-    },
-    "handlers": {
-        "console": {"class": "logging.StreamHandler", "formatter": "simple"},
-        "error": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": "error.log",
-            "formatter": "simple",
-            "maxBytes": 1024 * 1024 * 100,  # 100 mb
-        },
-        "main": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": "main.log",
-            "formatter": "simple",
-            "maxBytes": 1024 * 1024 * 100,  # 100 mb
-        },
-    },
-    "loggers": {
-        "django": {"handlers": ["error"], "level": "DEBUG"},
-        "root": {"handlers": ["console", "main"], "level": "DEBUG"},
-    },
+# Configuration for DjangoQ
+Q_CLUSTER = {
+    "name": "DjangORM", #use Django ORM as backend 
+    "workers": 1, #max 1 parallel tasks
+    #'timeout': 90, # disable timeout
+    "retry": 180000,  # set the retry so high, that long running tasks are not rescheduled
+    "queue_limit": 50,
+    "bulk": 10,
+    "orm": "default",
+    "catch_up": False,  # do not run old unrun schedules
+    #"sync": True, #Don't run asynchronously
 }
 
-dictConfig(LOGGING)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    # Formatters ###########################################################
+    'formatters': {
+      'console': {
+          'format': '%(name)-12s %(levelname)-8s %(message)s'
+      },
+      'file': {
+          'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
+      },
+    },
+    # Handlers #############################################################
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'main.log',
+            'formatter': 'file'
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console'
+        },
+        'p4s': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'p4s.log',
+            'formatter': 'file'
+        },
+    },
+    # Loggers ####################################################################
+    'loggers': {
+        'django': {
+            'handlers': ['file',],
+            'level': 'DEBUG',
+        },
+        'root': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+        },
+        'p4s': {
+            'handlers': ['p4s', 'console'],
+            'level': 'DEBUG',
+        },
+    },
+}

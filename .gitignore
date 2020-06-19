@@ -216,4 +216,5 @@ crontasks.*
 *.db
 staticfiles
 static
+.venv
 # End of https://www.gitignore.io/api/git,venv,python,django,visualstudiocode

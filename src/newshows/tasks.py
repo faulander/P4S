@@ -12,15 +12,7 @@ from .models import Show, ShowType, Genre, Status, Language, Country, Network, W
 import requests
 import pendulum
 
-logger = logging.getLogger(__name__)
-
-
-def ChangeSchedulingToOneDay():
-    schedule = IntervalSchedule.objects.get(every=1,period=IntervalSchedule.DAYS)
-    task = PeriodicTask.objects.get(name='Get the list of TV Shows from TV Maze')
-    task.interval = schedule
-    task.save()
-
+logger = logging.getLogger("p4s")
 
 # checked for V 0.2.0
 def _is_json(myjson):
@@ -137,93 +129,96 @@ def HelperUpdateTVMaze():
     every page contains 250 shows, leaving spaces if shows are deleted.
     the updateTvMaze function catches up from last run and gets the new shows.
     """
-    site_settings = Setting.load()
-    url = "http://api.tvmaze.com/shows?page=" + str(site_settings.page)
-    statuscode, shows = _requestURL(url)
-    if statuscode != 200:
-        ChangeSchedulingToOneDay()
-        site_settings.page -= 1
+    while True:
+        site_settings = Setting.load()
         url = "http://api.tvmaze.com/shows?page=" + str(site_settings.page)
         statuscode, shows = _requestURL(url)
-    lstGenres = list()
-    for show in shows:
-        if show['language'] is not None:
-            dbLanguage, _ = Language.objects.get_or_create(language=show['language'])
-        else:
-            dbLanguage = None
-        for genre in show["genres"]:
-            dbGenre, _ = Genre.objects.get_or_create(genre=genre)
-            lstGenres.append(dbGenre)
-        if show['type'] is not None:
-            dbType, _ = ShowType.objects.get_or_create(type=show['type'])
-        else:
-            dbType = None
-        dbStatus, _ = Status.objects.get_or_create(status=show['status'])
-        if show['network'] is not None:
-            dbCountry, _ = Country.objects.get_or_create(
-                country=show['network']['country']['name'],
-                code=show['network']['country']['code'],
-                timezone=show['network']['country']['timezone']
-            )
-            dbNetwork, _ = Network.objects.get_or_create(
-                tvmaze_id=show['network']['id'],
-                network=show['network']['name'],
-                country=dbCountry
-            )
-        else:
-            dbNetwork = None
-        if show['webChannel'] is not None:
-            if show['webChannel']['country'] is not None:
+        # if statuscode == 404:
+        #     #ChangeSchedulingToOneDay()
+        #     site_settings.page -= 1
+        #     url = "http://api.tvmaze.com/shows?page=" + str(site_settings.page)
+        #     statuscode, shows = _requestURL(url)
+        lstGenres = list()
+        for show in shows:
+            if show['language'] is not None:
+                dbLanguage, _ = Language.objects.get_or_create(language=show['language'])
+            else:
+                dbLanguage = None
+            for genre in show["genres"]:
+                dbGenre, _ = Genre.objects.get_or_create(genre=genre)
+                lstGenres.append(dbGenre)
+            if show['type'] is not None:
+                dbType, _ = ShowType.objects.get_or_create(type=show['type'])
+            else:
+                dbType = None
+            dbStatus, _ = Status.objects.get_or_create(status=show['status'])
+            if show['network'] is not None:
                 dbCountry, _ = Country.objects.get_or_create(
-                    country=show['webChannel']['country']['name'],
-                    code=show['webChannel']['country']['code'],
-                    timezone=show['webChannel']['country']['timezone']
+                    country=show['network']['country']['name'],
+                    code=show['network']['country']['code'],
+                    timezone=show['network']['country']['timezone']
+                )
+                dbNetwork, _ = Network.objects.get_or_create(
+                    tvmaze_id=show['network']['id'],
+                    network=show['network']['name'],
+                    country=dbCountry
                 )
             else:
-                dbCountry = None
-            dbWebchannel, _ = Webchannel.objects.get_or_create(
-                tvmaze_id=show['webChannel']['id'],
-                name=show['webChannel']['name'],
-                country=dbCountry
+                dbNetwork = None
+            if show['webChannel'] is not None:
+                if show['webChannel']['country'] is not None:
+                    dbCountry, _ = Country.objects.get_or_create(
+                        country=show['webChannel']['country']['name'],
+                        code=show['webChannel']['country']['code'],
+                        timezone=show['webChannel']['country']['timezone']
+                    )
+                else:
+                    dbCountry = None
+                dbWebchannel, _ = Webchannel.objects.get_or_create(
+                    tvmaze_id=show['webChannel']['id'],
+                    name=show['webChannel']['name'],
+                    country=dbCountry
+                )
+            else:
+                dbWebchannel = None
+            if show['runtime'] is not None:
+                runtime = int(show['runtime'])
+            else:
+                runtime = 0
+            if show['premiered'] is not None:
+                premiere_obj = datetime.datetime.strptime(show['premiered'], '%Y-%m-%d')
+                premiere = make_aware(premiere_obj)  # make timestamp timezone aware
+            else:
+                premiere = None
+            dbShow, created = Show.objects.get_or_create(
+                tvmaze_id=show['id'],
+                defaults={
+                    'url': show['url'],
+                    'name': show['name'],
+                    'type': dbType,
+                    'language': dbLanguage,
+                    'status': dbStatus,
+                    'runtime': runtime,
+                    'premiere': premiere,
+                    'network': dbNetwork,
+                    'webchannel': dbWebchannel,
+                    'tvrage_id': show['externals']['tvrage'],
+                    'thetvdb_id': show['externals']['thetvdb'],
+                    'imdb_id': show['externals']['imdb']
+                }
             )
-        else:
-            dbWebchannel = None
-        if show['runtime'] is not None:
-            runtime = int(show['runtime'])
-        else:
-            runtime = 0
-        if show['premiered'] is not None:
-            premiere_obj = datetime.datetime.strptime(show['premiered'], '%Y-%m-%d')
-            premiere = make_aware(premiere_obj)  # make timestamp timezone aware
-        else:
-            premiere = None
-        dbShow, created = Show.objects.get_or_create(
-            tvmaze_id=show['id'],
-            defaults={
-                'url': show['url'],
-                'name': show['name'],
-                'type': dbType,
-                'language': dbLanguage,
-                'status': dbStatus,
-                'runtime': runtime,
-                'premiere': premiere,
-                'network': dbNetwork,
-                'webchannel': dbWebchannel,
-                'tvrage_id': show['externals']['tvrage'],
-                'thetvdb_id': show['externals']['thetvdb'],
-                'imdb_id': show['externals']['imdb']
-            }
-        )
-        if created:
-            logger.info("New show added: {}".format(show['name']))
-        #else:
-        #    logger.warning("Show already in DB: {}".format(show['name']))
-        for lstGenre in lstGenres:
-            lstGenre.shows.add(dbShow)
-        dbShow.save()
-        lstGenres.clear()
-    site_settings.page += 1
-    site_settings.save()
+            if created:
+                logger.info("New show added: {}".format(show['name']))
+            for lstGenre in lstGenres:
+                lstGenre.shows.add(dbShow)
+            dbShow.save()
+            lstGenres.clear()
+        if statuscode != 429: # if we have queried the api too often, don't move on to the next page
+            site_settings.page += 1
+            site_settings.save()
+        if statuscode == 404: # if we reached the last page
+            break
+            #logger.info("Trying page {}".format(site_settings.page))
 
 #checked for 0.2.0
 def updateSingleShow(tvmaze_id):
@@ -298,7 +293,6 @@ def updateSingleShow(tvmaze_id):
                 'tvrage_id':show['externals']['tvrage'],
                 'thetvdb_id':show['externals']['thetvdb'],
                 'imdb_id':show['externals']['imdb']})
-    time.sleep(1)            
 
 #checked for 0.2.0
 def HelperUpdateShows():
@@ -315,7 +309,7 @@ def HelperUpdateShows():
                     date_tvmaze_update = pendulum.from_timestamp(u[str(i + 1)])
                     if date_tvmaze_update >= db_last_update:
                         updateSingleShow(str(i + 1))
-                except KeyError:
+                except:
                     pass
         site_settings.last_tvmaze_full_update = pendulum.now()
         site_settings.save()

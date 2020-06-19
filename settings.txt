@@ -1,0 +1,1 @@
+INSERT INTO "main"."newshows_setting" ("id", "profile_id", "addmonitored", "seasonfolders", "SONARR_APIKEY", "SONARR_OK", "SONARR_ROOTFOLDER", "SONARR_URL", "last_tvmaze_full_update", "page") VALUES ('1', '1', '1', '1', 'c30957f85cfd4ba1968076c7e8375d52', '1', '', 'http://192.168.42.167:8989/api', '2020-01-01', '0');

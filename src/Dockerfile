@@ -6,4 +6,5 @@ ADD requirements.txt /code/
 RUN pip install -r requirements.txt
 ADD . /code/
 RUN chmod +x /code/start.sh
+EXPOSE 8000
 ENTRYPOINT ["/bin/bash", "/code/start.sh"]

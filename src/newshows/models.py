@@ -38,7 +38,7 @@ class SingletonModel(models.Model):
 
 
 class ShowType(models.Model):
-    type = models.CharField(max_length=30, blank=True, null=True)
+    type = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return self.type
@@ -48,7 +48,7 @@ class ShowType(models.Model):
 
 
 class Language(models.Model):
-    language = models.CharField(max_length=30)
+    language = models.CharField(max_length=50)
 
     def __str__(self):
         return self.language
@@ -58,7 +58,7 @@ class Language(models.Model):
 
 
 class Genre(models.Model):
-    genre = models.CharField(max_length=30)
+    genre = models.CharField(max_length=50)
 
     def __str__(self):
         return self.genre
@@ -68,7 +68,7 @@ class Genre(models.Model):
 
 
 class Status(models.Model):
-    status = models.CharField(max_length=30)
+    status = models.CharField(max_length=50)
 
     def __str__(self):
         return self.status
@@ -78,7 +78,7 @@ class Status(models.Model):
 
 
 class Country(models.Model):
-    country = models.CharField(max_length=30)
+    country = models.CharField(max_length=50)
     code = models.CharField(max_length=10)
     timezone = models.CharField(max_length=30)
 
@@ -91,7 +91,7 @@ class Country(models.Model):
 
 class Network(models.Model):
     tvmaze_id = models.IntegerField()
-    network = models.CharField(max_length=30)
+    network = models.CharField(max_length=50)
     country = models.ForeignKey(
         Country, on_delete=models.CASCADE, blank=True, null=True
     )
@@ -105,7 +105,7 @@ class Network(models.Model):
 
 class Webchannel(models.Model):
     tvmaze_id = models.IntegerField()
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=50)
     country = models.ForeignKey(
         Country, on_delete=models.CASCADE, blank=True, null=True
     )
@@ -119,8 +119,8 @@ class Webchannel(models.Model):
 
 class Show(models.Model):
     tvmaze_id = models.IntegerField()
-    url = models.CharField(max_length=100, blank=True, null=True, default=None)
-    name = models.CharField(max_length=30, verbose_name="Show")
+    url = models.CharField(max_length=200, blank=True, null=True, default=None)
+    name = models.CharField(max_length=200, verbose_name="Show")
     type = models.ForeignKey(ShowType, on_delete=models.CASCADE)
     language = models.ForeignKey(
         Language, on_delete=models.CASCADE, blank=True, null=True, default=None
@@ -137,9 +137,9 @@ class Show(models.Model):
     webchannel = models.ForeignKey(
         Webchannel, on_delete=models.CASCADE, blank=True, null=True, default=None
     )
-    tvrage_id = models.CharField(max_length=10, blank=True, null=True, default=None)
-    thetvdb_id = models.CharField(max_length=10, blank=True, null=True, default=None)
-    imdb_id = models.CharField(max_length=10, blank=True, null=True, default=None)
+    tvrage_id = models.CharField(max_length=20, blank=True, null=True, default=None)
+    thetvdb_id = models.CharField(max_length=20, blank=True, null=True, default=None)
+    imdb_id = models.CharField(max_length=20, blank=True, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     insonarr = models.BooleanField(default=False, verbose_name="S")
