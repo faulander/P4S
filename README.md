@@ -14,7 +14,7 @@ P4S is a app that updates it's local database with the show information from TV 
 
 Production/Docker:
 - Clone the repository: ```https://github.com/faulander/P4S.git```
-- change into src directory
+- change into app directory
 - rename env.prod.db.example to env.prod.db and adjust the settings
 - rename env.prod.example to env.prod and adjust the settings
 - set firststart.prod.sh and startapp.prod.sh to executable (chmod +x)
@@ -23,7 +23,7 @@ Production/Docker:
 
 
 ## Usage
-- Browse to http://localhost:8000/
+- Browse to http://localhost:1337/
 - Browse to settings
 - add Sonarr url in form of "http://localhost:8989/api"
 - add the Sonarr apikey
