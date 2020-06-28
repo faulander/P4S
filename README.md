@@ -15,24 +15,19 @@ P4S is a app that updates it's local database with the show information from TV 
 Production/Docker:
 - Clone the repository: ```https://github.com/faulander/P4S.git```
 - change into src directory
-- docker-compose up
+- rename env.prod.db.example to env.prod.db and adjust the settings
+- rename env.prod.example to env.prod and adjust the settings
+- set firststart.prod.sh and startapp.prod.sh to executable (chmod +x)
+- run ./firststart.prod.sh
+- run ./startapp.prod.sh
 
-Development:
-
-- make sure that you have at least Python 3.7 installed: ```python -V```
-- clone or download the repository
-- change into the downloaded directory
-- install venv: ```python -m venv .venv```
-- activate virtual environment
-- run pip install: ```pip install -r requirements.txt```
-- switch to source directory: ```cd src```
-- run migrations: ```python manage.py migrate```
-- run collectstatic: ```python manage.py collectstatic```
-- To Run Webserver only: ```python manage.py runserver```
-- To Run Wevserver and background tasks: ```start.sh```
 
 ## Usage
 - Browse to http://localhost:8000/
+- Browse to settings
+- add Sonarr url in form of "http://localhost:8989/api"
+- add the Sonarr apikey
+- save
 - Browse to settings
 - Choose at least the profile with which the shows should be added to sonarr
 - Browse to shows
@@ -40,6 +35,7 @@ Development:
 
 
 ## Release History
+* 0.4.0 First Production version with docker
 * 0.3.0 (Development)
     * Docker ready
     * Switched to Whitenoise for staticfile serving
