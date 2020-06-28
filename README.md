@@ -1,9 +1,10 @@
-# P4S
+﻿ # P4S
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 > Premieres for Sonarr - a small sonarr companion app to find all the new shows you've never been interested in!
 
+![P4S - Premieres for Sonarr](/screenshots/p4s.png?raw=true "P4S Main Screen")
 
 P4S is a app that updates it's local database with the show information from TV Maze. You can then search for shows and conveniently adding them to Sonarr. The difference between Sonarr's own search is, that you can filter by language, premiere date, etc.
 
@@ -25,7 +26,7 @@ Production/Docker:
 ## Usage
 - Browse to http://localhost:1337/
 - Browse to settings
-- add Sonarr url in form of "http://localhost:8989/api"
+- add Sonarr url in form of "http://<ip of sonarr>:8989/api"
 - add the Sonarr apikey
 - save
 - Browse to settings
@@ -33,14 +34,25 @@ Production/Docker:
 - Browse to shows
 - Click the add button on any show you want added to Sonarr
 
+## Known Issues
+### 400 Bad Request when opening the homepage at <ip-adress>:1337/
+Changed in .env.prod:
+DJANGO_ALLOWED_HOSTS=*
+
+### Cannot connect to Sonarr
+- Did you enter the Sonarr URL in the form of http://ip-adress:8989/api ?
+- Did you double check the API Key?
+- Is Sonarr reachable from where you installed P4S?
+
 
 ## Release History
-* 0.4.0 First Production version with docker
+* 0.4.0 (Current master)
+   * First Production version with docker
 * 0.3.0 (Development)
     * Docker ready
     * Switched to Whitenoise for staticfile serving
     * Switched to DjangoQ for background tasks
-* 0.1.1 (current)
+* 0.1.1
     * Changes to application setup for docker environment
 * 0.1.0 
     * The first proper release
