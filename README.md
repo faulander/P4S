@@ -14,14 +14,15 @@ P4S is a app that updates it's local database with the show information from TV 
 ## Installation
 
 Production/Docker:
-- Clone the repository: ```https://github.com/faulander/P4S.git```
-- change into app directory
-- rename env.prod.db.example to env.prod.db and adjust the settings
-- rename env.prod.example to env.prod and adjust the settings
-- set firststart.prod.sh and startapp.prod.sh to executable (chmod +x)
-- run ./firststart.prod.sh
-- run ./startapp.prod.sh
-
+- Clone the repository: ```git clone https://github.com/faulander/P4S.git```
+- Change into app directory ```cd P4S/app```
+- Copy the example file ```cp .env.prod.example .env.prod```
+- Copy the example db file ```cp .env.prod.db.example .env.prod.db```
+- Edit both files and enter your desired variable values
+- Make the Shell files executables ```chmod +x *.sh```
+- Run ```./firstart.sh```
+- Run ```./startapp.prod.sh```
+- Browse to http://localhost:1337/ (or Ip-Adress of server where you installed it)
 
 ## Usage
 - Browse to http://localhost:1337/
@@ -33,29 +34,6 @@ Production/Docker:
 - Choose at least the profile with which the shows should be added to sonarr
 - Browse to shows
 - Click the add button on any show you want added to Sonarr
-
-## Known Issues
-### 400 Bad Request when opening the homepage at <ip-adress>:1337/
-Changed in .env.prod:
-DJANGO_ALLOWED_HOSTS=*
-
-### Cannot connect to Sonarr
-- Did you enter the Sonarr URL in the form of http://ip-adress:8989/api ?
-- Did you double check the API Key?
-- Is Sonarr reachable from where you installed P4S?
-
-
-## Release History
-* 0.4.0 (Current master)
-   * First Production version with docker
-* 0.3.0 (Development)
-    * Docker ready
-    * Switched to Whitenoise for staticfile serving
-    * Switched to DjangoQ for background tasks
-* 0.1.1
-    * Changes to application setup for docker environment
-* 0.1.0 
-    * The first proper release
 
 ## Meta
 
