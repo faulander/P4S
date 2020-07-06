@@ -20,7 +20,7 @@ Production/Docker:
 - Copy the example db file ```cp .env.prod.db.example .env.prod.db```
 - Edit both files and enter your desired variable values
 - Make the Shell files executables ```chmod +x *.sh```
-- Run ```./firstart.sh```
+- Run ```./firstart.prod.sh```
 - Run ```./startapp.prod.sh```
 - Browse to http://localhost:1337/ (or Ip-Adress of server where you installed it)
 
