@@ -7,7 +7,7 @@ blessed==1.17.8
 certifi==2019.11.28
 chardet==3.0.4
 contextvars==2.4
-Django==3.1.6
+Django==3.1.8
 django-crispy-forms==1.9.0
 django-extra-views==0.13.0
 django-filter==2.2.0
