@@ -7,8 +7,8 @@ django-apscheduler
 gunicorn
 pendulum
 apscheduler
-python-crontab
 python-dateutil
 python-dotenv
 requests
 whitenoise
+psycopg2-binary

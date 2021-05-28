@@ -64,8 +64,12 @@ WSGI_APPLICATION = "new_shows.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "p4s.db"),
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
 
@@ -122,4 +126,47 @@ MESSAGE_TAGS = {
     messages.SUCCESS: "alert-success",
     messages.WARNING: "alert-warning",
     messages.ERROR: "alert-danger",
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    # Formatters ###########################################################
+    "formatters": {
+        "console": {"format": "%(name)-12s %(levelname)-8s %(message)s"},
+        "file": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s"},
+    },
+    # Handlers #############################################################
+    "handlers": {
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": "main.log",
+            "formatter": "file",
+        },
+        "console": {"class": "logging.StreamHandler", "formatter": "console"},
+        "p4s": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": "p4s.log",
+            "formatter": "file",
+        },
+    },
+    # Loggers ####################################################################
+    "loggers": {
+        "django": {
+            "handlers": [
+                "file",
+            ],
+            "level": "DEBUG",
+        },
+        "root": {
+            "handlers": ["file", "console"],
+            "level": "DEBUG",
+        },
+        "p4s": {
+            "handlers": ["p4s", "console"],
+            "level": "DEBUG",
+        },
+    },
 }

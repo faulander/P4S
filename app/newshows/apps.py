@@ -11,6 +11,7 @@ class MyAppConfig(AppConfig):
             "migrate",
             "loaddata",
             "collectstatic",
+            "mgmUpdateTVMaze",
         ]:
             from .scheduler import start
 
