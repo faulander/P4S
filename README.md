@@ -17,7 +17,8 @@ Production/Docker:
 - Clone the repository: ```git clone https://github.com/faulander/P4S.git```
 - Change into app directory ```cd P4S/app```
 - Copy the example file ```cp .env.prod.example .env.prod```
-- Edit the file and enter your desired variable values
+- Copy the example file ```cp .env.prod.db.example .env.prod.db```
+- Edit the files and enter your desired variable values
 - Make the Shell files executables ```chmod +x *.sh```
 - Run ```./firstart.prod.sh```
 - Run ```./startapp.prod.sh```
@@ -25,7 +26,7 @@ Production/Docker:
 ## Usage
 - Browse to http://localhost:1337/
 - Browse to settings
-- add Sonarr url in form of "http://<ip of sonarr>:8989/api"
+- add Sonarr url in form of "http://ip of sonarr:8989/api"
 - add the Sonarr apikey
 - save
 - Browse to settings
