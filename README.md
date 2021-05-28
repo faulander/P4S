@@ -21,7 +21,6 @@ Production/Docker:
 - Make the Shell files executables ```chmod +x *.sh```
 - Run ```./firstart.prod.sh```
 - Run ```./startapp.prod.sh```
-- Browse to http://localhost:1337/ (or Ip-Adress of server where you installed it)
 
 ## Usage
 - Browse to http://localhost:1337/
@@ -30,9 +29,16 @@ Production/Docker:
 - add the Sonarr apikey
 - save
 - Browse to settings
-- Choose at least the profile with which the shows should be added to sonarr
+- Choose at least the profile with which the shows should be added to sonarr (if no profile is selectable, the Sonarr credentials are wrong!)
 - Browse to shows
 - Click the add button on any show you want added to Sonarr
+
+## First Update of the db
+If you want to update the db right away (it's afterwards scheduled), do the following:
+- Browse to http://localhost:1337/admin (or wherever you installed P4S)
+- Login with admin:admin
+- Browse to Django Apscheduler / Django Jobs
+- Run the 2 jobs: "updateTVMaze" and "updateShows" manually (you can check their progress under Django job executions)
 
 ## Meta
 
@@ -49,7 +55,7 @@ Distributed under the MIT license. See ``LICENSE`` for more information.
 5. Create a new Pull Request
 
 ## Changes
-- Dropped support for MySQL, Postgres and Nginx - because it's not needed
+- Dropped support for MySQL and Nginx - because it's not needed
 - Changed the way the updates work
 
 .## Contributors ✨

@@ -15,10 +15,10 @@ class SingletonModel(models.Model):
     Abstract Class for a Singleton Model
     It only allows one row in the db and the delete method is disabled.
     To load the site settings use:
-    
+
     from .models import Settings
     settings = Settings.load()
-    
+
     """
 
     class Meta:

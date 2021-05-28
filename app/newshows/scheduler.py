@@ -15,7 +15,7 @@ from .tasks import (
 
 def start():
     run1 = pendulum.now()
-    run1 = run1.add(minutes=30)
+    run1 = run1.add(minutes=15)
     run1 = run1.to_datetime_string()
     run2 = pendulum.now()
     run2 = run2.add(minutes=60)
@@ -81,27 +81,6 @@ def start():
         name="updateShows",
         jobstore="default",
         id="updateShows",
-        replace_existing=True,
-        max_instances=1,
-    )
-    # Run once on application startup with delay
-    scheduler.add_job(
-        HelperUpdateTVMaze,
-        "date",
-        run_date=run1,
-        name="updateTVMazeOnceAtStartup",
-        jobstore="default",
-        id="updateTVMazeOnceAtStartup",
-        replace_existing=True,
-        max_instances=1,
-    )
-    scheduler.add_job(
-        HelperUpdateShows,
-        "date",
-        run_date=run2,
-        name="updateShowsOnceAtStartup",
-        jobstore="default",
-        id="updateShowsOnceAtStartup",
         replace_existing=True,
         max_instances=1,
     )
