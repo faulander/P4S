@@ -1,7 +1,17 @@
+import sys
 from django.apps import AppConfig
 
 
-class NewshowsConfig(AppConfig):
-    name = 'newshows'
+class MyAppConfig(AppConfig):
+    name = "newshows"
 
-# checked for V 0.2.0
+    def ready(self):
+        if not sys.argv[1] in [
+            "makemigrations",
+            "migrate",
+            "loaddata",
+            "collectstatic",
+        ]:
+            from .scheduler import start
+
+            start()

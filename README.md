@@ -17,8 +17,7 @@ Production/Docker:
 - Clone the repository: ```git clone https://github.com/faulander/P4S.git```
 - Change into app directory ```cd P4S/app```
 - Copy the example file ```cp .env.prod.example .env.prod```
-- Copy the example db file ```cp .env.prod.db.example .env.prod.db```
-- Edit both files and enter your desired variable values
+- Edit the file and enter your desired variable values
 - Make the Shell files executables ```chmod +x *.sh```
 - Run ```./firstart.prod.sh```
 - Run ```./startapp.prod.sh```
@@ -49,7 +48,11 @@ Distributed under the MIT license. See ``LICENSE`` for more information.
 4. Push to the branch (`git push origin yourfeaturename`)
 5. Create a new Pull Request
 
-## Contributors ✨
+## Changes
+- Dropped support for MySQL, Postgres and Nginx - because it's not needed
+- Changed the way the updates work
+
+.## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 

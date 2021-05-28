@@ -3,7 +3,7 @@
 #First run
 echo -e " \e[32m===============================================================================================\e[0m"
 echo -e " \e[32mP4S - Building Images\e[0m"
-docker-compose up -d --build --remove-orphans
+docker-compose up -d --build --remove-orphans --force-recreate
 echo -e " \e[32m===============================================================================================\e[0m"
 echo -e " \e[32mP4S - Migrate Database\e[0m"
 docker-compose exec web python manage.py migrate --noinput

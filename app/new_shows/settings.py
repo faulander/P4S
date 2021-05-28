@@ -8,9 +8,10 @@ from django.contrib.messages import constants as messages
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY", default="Please change me!")
 DEBUG = int(os.environ.get("DEBUG", default=0))
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+# ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -25,12 +26,13 @@ INSTALLED_APPS = [
     "django_filters",
     "extra_views",
     "crispy_forms",
+    "django_apscheduler",
     "newshows",
-    "django_q",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -62,20 +64,34 @@ WSGI_APPLICATION = "new_shows.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
-        "USER": os.environ.get("SQL_USER", "user"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-        "HOST": os.environ.get("SQL_HOST", "localhost"),
-        "PORT": os.environ.get("SQL_PORT", "5432"),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "p4s.db"),
     }
 }
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+SCHEDULER_CONFIG = {
+    "apscheduler.jobstores.default": {
+        "class": "django_apscheduler.jobstores:DjangoJobStore"
+    },
+    "apscheduler.executors.processpool": {"type": "threadpool"},
+}
+SCHEDULER_AUTOSTART = True
+
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
 ]
 
 
@@ -106,65 +122,4 @@ MESSAGE_TAGS = {
     messages.SUCCESS: "alert-success",
     messages.WARNING: "alert-warning",
     messages.ERROR: "alert-danger",
-}
-
-# Configuration for DjangoQ
-Q_CLUSTER = {
-    "name": "DjangORM", #use Django ORM as backend 
-    "workers": 1, #max 1 parallel tasks
-    #'timeout': 90, # disable timeout
-    "retry": 180000,  # set the retry so high, that long running tasks are not rescheduled
-    "queue_limit": 50,
-    "bulk": 10,
-    "orm": "default",
-    "catch_up": False,  # do not run old unrun schedules
-    #"sync": True, #Don't run asynchronously
-}
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    # Formatters ###########################################################
-    'formatters': {
-      'console': {
-          'format': '%(name)-12s %(levelname)-8s %(message)s'
-      },
-      'file': {
-          'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
-      },
-    },
-    # Handlers #############################################################
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'main.log',
-            'formatter': 'file'
-        },
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'console'
-        },
-        'p4s': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'p4s.log',
-            'formatter': 'file'
-        },
-    },
-    # Loggers ####################################################################
-    'loggers': {
-        'django': {
-            'handlers': ['file',],
-            'level': 'DEBUG',
-        },
-        'root': {
-            'handlers': ['file', 'console'],
-            'level': 'DEBUG',
-        },
-        'p4s': {
-            'handlers': ['p4s', 'console'],
-            'level': 'DEBUG',
-        },
-    },
 }
